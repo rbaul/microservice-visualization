@@ -1,0 +1,13 @@
+rootProject.name = 'microservice-visualization'
+
+include 'microservice-visualization'
+include 'microservice-visualization-webapp'
+
+// Microservice Visualization by Dependencies (Demo Project)
+include 'basket', 'customer', 'ordering', 'product'
+include 'basket-api'
+project(':basket').projectDir = new File('demo/basket')
+project(':basket-api').projectDir = new File('demo/basket-api')
+project(':customer').projectDir = new File('demo/customer')
+project(':ordering').projectDir = new File('demo/ordering')
+project(':product').projectDir = new File('demo/product')

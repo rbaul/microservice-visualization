@@ -1,0 +1,37 @@
+plugins {
+  id 'java'
+  id 'com.github.node-gradle.node' version '3.5.1'
+}
+
+node {
+//    version = '14.17.3'
+//    npmVersion = '6.14.13'
+  download = false
+}
+
+tasks.register('bundle', NpmTask) {
+  dependsOn npmInstall
+  args = ['run', 'build', '--production']
+}
+
+tasks.register('run', NpmTask) {
+  args = ['start']
+}
+
+tasks.register('runDevProxy', NpmTask) {
+  args = ['run', 'proxy']
+}
+
+tasks.register('uiTest', NpmTask) {
+  args = ['run', 'test']
+}
+
+tasks.register('webjar', Jar) {
+  from(fileTree('dist/webapp')) {
+    into 'META-INF/resources'
+  }
+}
+
+check.dependsOn(test)
+jar.dependsOn('bundle')
+jar.finalizedBy('webjar')

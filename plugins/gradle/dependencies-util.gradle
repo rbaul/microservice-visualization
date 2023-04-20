@@ -1,0 +1,109 @@
+import groovy.json.JsonOutput
+
+if (!project.hasProperty('dependencyFileLocation')) {
+    project.ext.dependencyFileLocation = ""
+}
+
+static def getDependencyFormatted(group, name, version) {
+    return group + ':' + name + ':' + version
+}
+
+def getFirstLevelModuleDependencies() {
+    return configurations.compileClasspath.resolvedConfiguration.getFirstLevelModuleDependencies().collect {
+//        [
+//                groupId: it.getModuleGroup(),
+//                artifactId: it.getModuleName(),
+//                version: it.getModuleVersion()
+//        ]
+        getDependencyFormatted(it.getModuleGroup(), it.getModuleName(), it.getModuleVersion())
+    }
+}
+
+def getManagementDependencies() {
+    return dependencyManagement.getPomConfigurer().dependencyManagement.importedBoms.collect {
+        getDependencyFormatted(it.coordinates.groupId, it.coordinates.artifactId, it.coordinates.version)
+    }
+}
+
+def getJson() {
+    def dependencies = getFirstLevelModuleDependencies()
+    def managementDependencies = getManagementDependencies()
+
+    def json = [
+            name: project.getName(),
+            tags: [
+                    java: JavaVersion.current().toString(),
+                    gradle: project.getGradle().getGradleVersion()
+            ],
+            dependencies: dependencies,
+            managementDependencies: managementDependencies
+    ]
+    return json
+}
+
+tasks.register('createDependencyFile') {
+    def dependencyJson = getJson()
+    File file = new File("${project.rootDir}/${dependencyFileLocation}" + dependencyJson.name + '.json')
+    file.write(JsonOutput.prettyPrint(JsonOutput.toJson(dependencyJson)))
+}
+
+//tasks.register('javaVersion') {
+//    println JavaVersion.current()
+//}
+
+//tasks.register('getFirstLevelModuleDependencies') {
+//    final def dependencies = configurations.compileClasspath.resolvedConfiguration.getFirstLevelModuleDependencies()
+//    println dependencies.size()
+//    dependencies.each {
+//        println it
+//    }
+//}
+
+//tasks.register('getResolvedArtifacts') {
+//    println configurations.compileClasspath.resolvedConfiguration.getResolvedArtifacts().size()
+//    println configurations.compileClasspath.resolvedConfiguration.getResolvedArtifacts()
+////    println configurations.compileClasspath.resolvedConfiguration.getLenientConfiguration().getAllModuleDependencies().size()
+////    println configurations.compileClasspath.resolvedConfiguration.getLenientConfiguration().getAllModuleDependencies()
+//}
+
+//tasks.register('bom-dependencies') {
+//    final def configurer = dependencyManagement.getPomConfigurer()
+//
+//    def boms = configurer.dependencyManagement.importedBoms
+//    println boms.size()
+//    boms.each {
+//        def coordinates = it.coordinates
+//        println "- " + coordinates.groupId + ":" + coordinates.artifactId + ":" + coordinates.version
+//    }
+//}
+
+//tasks.register('all-dependencies') {
+//    def depNames = new HashSet<ModuleComponentIdentifier>()
+//    dependencyManagement{
+//        imports {
+//            resolutionStrategy {
+//                componentSelection {
+//                    all { ComponentSelection selection ->
+//                        depNames.add(selection.candidate)
+////                    println selection.candidate.module + ' ' + selection.candidate.version
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    configurations.compileClasspath.resolvedConfiguration
+//
+//    println depNames.size()
+//    depNames.each {
+//        println it
+//    }
+//}
+
+//tasks.register('readOut') {
+//    configurations.runtimeClasspath {
+//        it.allDependencies.each {
+//            println "- " + it.name + ", " + it.getGroup() + ":" + it.getName() + ":" + it.getVersion() + " " + it.properties['attributes']
+//        }
+//    }
+//}

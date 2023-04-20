@@ -1,0 +1,18 @@
+microservice-visualization:
+  tags:
+    "org.springframework.boot:spring-boot-dependencies": Spring Boot
+    "org.springframework.cloud:spring-cloud-dependencies": Spring Cloud
+    "org.springframework.boot:spring-boot-starter-web": MVC
+    "org.springframework.boot:spring-boot-starter-amqp": RabbitMQ
+  projects:
+    - name: Demo
+      description: Demo description
+      path-location: "result"
+      application-postfix:
+      application-api-postfix: -api
+      groups:
+        - name: Group Demo
+          description: Group Demo description
+          application-names:
+            - basket
+            - ordering
