@@ -1,0 +1,25 @@
+<p-table [value]="projects" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true" [rows]="10"
+  [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+  [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="400px">
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th style="width: 5rem"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-project>
+    <tr>
+      <td>{{ project.name }}</td>
+      <td>{{ project.description }}</td>
+      <td>
+        <button type="button" pButton pRipple icon="pi pi-angle-right" (click)="selectProjectVersion(project)"></button>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      In total there are {{projects ? projects.length : 0 }} projects.
+    </div>
+  </ng-template>
+</p-table>

@@ -1,6 +1,7 @@
 package com.github.rbaul.microservice_visualization.domain.model;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Embeddable
 public class ApplicationGroup {
+	@NotEmpty
 	private String name;
 	private String description;
 	private List<String> applicationNames;

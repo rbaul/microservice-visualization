@@ -20,5 +20,12 @@ public class ApplicationLiteDto {
 	private Long id;
 	
 	private String name;
+	
+	private String label;
+	
+	private String description;
+	
+	private String owner;
+	
 	private Map<String, String> tags;
 }

@@ -32,14 +32,24 @@ public class MicroserviceVisualizationProperties {
 		
 		private String applicationPostfix = "";
 		
-		private String applicationApiPostfix = "-api";
+		private List<String> applicationApiPostfixes = List.of("-api");
 		
 		private List<MicroserviceVisualizationGroup> groups;
+		
+		private List<MicroserviceVisualizationOwner> owners;
 	}
 	
 	@Getter
 	@Setter
 	public static class MicroserviceVisualizationGroup {
+		private String name;
+		private String description;
+		private List<String> applicationNames;
+	}
+	
+	@Getter
+	@Setter
+	public static class MicroserviceVisualizationOwner {
 		private String name;
 		private String description;
 		private List<String> applicationNames;

@@ -12,7 +12,6 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: create-drop
-      use-new-id-generator-mappings: true
       naming:
         implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
 

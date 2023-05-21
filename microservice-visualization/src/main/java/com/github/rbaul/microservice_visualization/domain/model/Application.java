@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,7 +30,14 @@ public class Application {
 	@GeneratedValue
 	private Long id;
 	
+	@NotEmpty
 	private String name;
+	
+	private String label;
+	
+	private String description;
+	
+	private String owner;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Map<String, String> tags;

@@ -1,0 +1,45 @@
+<!-- <p-toolbar styleClass="mb-4 gap-2">
+  <ng-template pTemplate="left">
+    <button pButton pRipple label="Show Naibords" icon="pi pi-upload" class="p-button-help"></button>
+    <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name"
+      defaultLabel="Select relevant applications" display="chip" (onChange)="onChangeSelectedApps($event.value)">
+    </p-multiSelect>
+  </ng-template>
+
+  <ng-template pTemplate="right">
+    <button pButton pRipple label="Export" icon="pi pi-upload" class="p-button-help"></button>
+  </ng-template>
+</p-toolbar> -->
+
+<div #visNetworkContainer class="vis-network-canvas"></div>
+<p-toolbar class="network-toolbar" styleClass="vertical-align">
+  <div class="p-toolbar-group-start">
+    <p-button icon="pi pi-arrows-alt" class="mr-2" (click)="fit()"></p-button>
+    <p-button icon="pi pi-search-plus" class="mr-2" (click)="zoomIn()"></p-button>
+    <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()"></p-button>
+
+
+
+    <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name" [showClear]="true"
+      (onClear)="clearAppFilter()" defaultLabel="Select relevant applications" display="chip"
+      (onChange)="onFilterApps($event.value)">
+    </p-multiSelect>
+
+    <p-dropdown [options]="moveToAppOptions" [(ngModel)]="selectedApp" (onChange)="onMoveToAppChanged($event.value)"
+      [filter]="true" filterBy="name" [showClear]="true" (onClear)="fit()" placeholder="Move to.." optionLabel="name">
+    </p-dropdown>
+
+    <p-multiSelect [options]="ownerOptions" [(ngModel)]="selectedOwners" optionLabel="name" [showClear]="true"
+      (onClear)="clearAppFilter()" defaultLabel="Select relevant owners" display="chip"
+      (onChange)="onFilterOwners($event.value)">
+    </p-multiSelect>
+  </div>
+</p-toolbar>
+
+<!-- <p-overlayPanel #op>
+  <ng-template pTemplate="content">
+    <h4>Custom Content</h4>
+  </ng-template>
+</p-overlayPanel> -->
+
+<p-contextMenu #contextMenu [model]="items" [target]="visNetworkContainer" [hidden]="isContextHidden()"></p-contextMenu>

@@ -7,6 +7,7 @@ import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.domain.model.ProjectVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -53,8 +54,13 @@ public class FolderProjectLoaderService extends ProjectLoaderService {
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
 			project.setApplications(applicationDependencies);
-			project.setConnections(createTopology(project, projectProperty.getApplicationPostfix(), projectProperty.getApplicationApiPostfix()));
-			project.setGroups(getGroups(projectProperty.getGroups()));
+			project.setConnections(createTopology(project, projectProperty.getApplicationPostfix(), projectProperty.getApplicationApiPostfixes()));
+			if (!CollectionUtils.isEmpty(projectProperty.getGroups())) {
+				project.setGroups(getGroups(projectProperty.getGroups()));
+			}
+			if (!CollectionUtils.isEmpty(projectProperty.getOwners())) {
+				project.setOwners(getOwners(projectProperty.getOwners()));
+			}
 			project.setVersion(DEFAULT_VERSION);
 			return Optional.of(project);
 		} catch (IOException e) {

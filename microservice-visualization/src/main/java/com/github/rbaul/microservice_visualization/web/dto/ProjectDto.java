@@ -25,5 +25,7 @@ public class ProjectDto {
 	
 	private List<ApplicationGroupDto> groups;
 	
+	private List<OwnerDto> owners;
+	
 	private ProjectVersionLiteDto projectVersion;
 }

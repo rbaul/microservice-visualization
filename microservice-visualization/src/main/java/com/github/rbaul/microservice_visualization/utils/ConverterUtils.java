@@ -12,7 +12,11 @@ public class ConverterUtils {
 	 */
 	public static Dependency convertDependency(String dependency) {
 		String[] split = dependency.split(":");
-		return new Dependency(split[0], split[1], split[2]);
+		if (split.length == 3) {
+			return new Dependency(split[0], split[1], split[2]);
+		} else { // Local Dependency
+			return new Dependency(null, split[1], null);
+		}
 	}
 	
 }

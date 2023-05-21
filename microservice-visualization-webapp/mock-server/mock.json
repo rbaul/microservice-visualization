@@ -1,0 +1,101 @@
+{
+  "project-versions-search": {
+    "content": [{
+      "id": 1,
+      "name": "Demo",
+      "description": "Demo description",
+      "mainProject": {
+        "id": 1,
+        "version": "1.0.0"
+      },
+      "projects": [{
+        "id": 1,
+        "version": "1.0.0"
+      }]
+    }],
+    "pageable": {
+      "sort": {
+        "empty": true,
+        "sorted": false,
+        "unsorted": true
+      },
+      "offset": 0,
+      "pageNumber": 0,
+      "pageSize": 10,
+      "paged": true,
+      "unpaged": false
+    },
+    "last": true,
+    "totalPages": 1,
+    "totalElements": 1,
+    "size": 10,
+    "number": 0,
+    "sort": {
+      "empty": true,
+      "sorted": false,
+      "unsorted": true
+    },
+    "first": true,
+    "numberOfElements": 1,
+    "empty": false
+  },
+  "projects": [{
+    "id": 1,
+    "version": "1.0.0",
+    "applications": [{
+      "id": 1,
+      "name": "ordering",
+      "tags": {
+        "gradle": "7.6.1",
+        "java": "17",
+        "Spring Boot": "3.0.5",
+        "MVC": "3.0.5"
+      }
+    }, {
+      "id": 3,
+      "name": "basket",
+      "tags": {
+        "gradle": "7.6.1",
+        "RabbitMQ": "2.7.10",
+        "java": "17",
+        "Spring Boot": "2.7.10",
+        "MVC": "2.7.10",
+        "Spring Cloud": "2022.0.2"
+      }
+    }, {
+      "id": 4,
+      "name": "product",
+      "tags": {
+        "gradle": "7.6.1",
+        "RabbitMQ": "3.0.5",
+        "java": "17",
+        "Spring Boot": "3.0.5",
+        "MVC": "3.0.5"
+      }
+    }, {
+      "id": 2,
+      "name": "customer",
+      "tags": {
+        "gradle": "7.6.1",
+        "RabbitMQ": "2.7.5",
+        "java": "17",
+        "Spring Boot": "2.7.5",
+        "MVC": "2.7.5",
+        "Spring Cloud": "2021.0.5"
+      }
+    }],
+    "connections": {
+      "customer": ["basket"]
+    },
+    "groups": [{
+      "name": "Group Demo",
+      "description": "Group Demo description",
+      "applicationNames": ["basket", "ordering"]
+    }],
+    "projectVersion": {
+      "id": 1,
+      "name": "Demo",
+      "description": "Demo description"
+    }
+  }]
+}

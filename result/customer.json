@@ -1,11 +1,13 @@
 {
     "name": "customer",
+    "label": "Customer",
+    "description": "Customer application",
+    "owner": "Team 1",
     "tags": {
         "java": "17",
         "gradle": "7.6.1"
     },
     "dependencies": [
-        "org.projectlombok:lombok:1.18.24",
         "org.springframework.boot:spring-boot-starter-amqp:2.7.5",
         "org.springframework.boot:spring-boot-starter-data-mongodb:2.7.5",
         "org.springframework.boot:spring-boot-starter-validation:2.7.5",

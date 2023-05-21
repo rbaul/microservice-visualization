@@ -5,6 +5,13 @@ import java.util.Map;
 
 public record ApplicationDependency(
 		String name,
+		
+		String label,
+		
+		String description,
+		
+		String owner,
+		
 		Map<String, String> tags,
 		List<String> dependencies,
 		List<String> managementDependencies

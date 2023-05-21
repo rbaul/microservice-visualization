@@ -51,6 +51,10 @@ public class Project {
 	private List<ApplicationGroup> groups;
 	
 	@ToString.Exclude
+	@ElementCollection
+	private List<Owner> owners;
+	
+	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "project_version_id")
 	private ProjectVersion projectVersion;

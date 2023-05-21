@@ -1,11 +1,13 @@
 {
     "name": "product",
+    "label": "Product",
+    "description": "Product application",
+    "owner": "Team 3",
     "tags": {
         "java": "17",
         "gradle": "7.6.1"
     },
     "dependencies": [
-        "org.projectlombok:lombok:1.18.26",
         "org.springframework.boot:spring-boot-starter-amqp:3.0.5",
         "org.springframework.boot:spring-boot-starter-data-mongodb:3.0.5",
         "org.springframework.boot:spring-boot-starter-validation:3.0.5",

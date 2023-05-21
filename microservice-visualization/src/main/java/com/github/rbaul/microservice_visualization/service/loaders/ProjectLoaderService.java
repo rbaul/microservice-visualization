@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.Application;
 import com.github.rbaul.microservice_visualization.domain.model.ApplicationGroup;
+import com.github.rbaul.microservice_visualization.domain.model.Owner;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.domain.model.ProjectVersion;
 import com.github.rbaul.microservice_visualization.utils.ConverterUtils;
@@ -36,7 +37,14 @@ public abstract class ProjectLoaderService {
 				.applicationNames(group.getApplicationNames()).build()).collect(Collectors.toList());
 	}
 	
-	protected Map<String, List<String>> createTopology(Project project, String applicationPostfix, String applicationApiPostfix) {
+	protected List<Owner> getOwners(List<MicroserviceVisualizationProperties.MicroserviceVisualizationOwner> owners) {
+		return owners.stream().map(group -> Owner.builder()
+				.name(group.getName())
+				.description(group.getDescription())
+				.applicationNames(group.getApplicationNames()).build()).collect(Collectors.toList());
+	}
+	
+	protected Map<String, List<String>> createTopology(Project project, String applicationPostfix, List<String> applicationApiPostfixes) {
 		Map<String, List<String>> appConnections = new HashMap<>();
 		Map<String, String> apiNameToOwnerAppName = new HashMap<>();
 		
@@ -46,7 +54,10 @@ public abstract class ProjectLoaderService {
 				applicationNameWithoutPostfix = applicationNameWithoutPostfix.substring(0, applicationNameWithoutPostfix.length() - applicationPostfix.length());
 			}
 			
-			apiNameToOwnerAppName.put(applicationNameWithoutPostfix + applicationApiPostfix, application.getName());
+			for (String applicationApiPostfix : applicationApiPostfixes) {
+				apiNameToOwnerAppName.put(applicationNameWithoutPostfix + applicationApiPostfix, application.getName());
+			}
+			
 		});
 		
 		project.getApplications().forEach(application -> application.getDependencies().forEach(dep -> {
@@ -65,6 +76,11 @@ public abstract class ProjectLoaderService {
 	protected Application convertApplicationDependencyToApplication(ApplicationDependency applicationDependency) {
 		Application application = new Application();
 		application.setName(applicationDependency.name());
+		String description = StringUtils.hasText(applicationDependency.description()) ?
+				applicationDependency.description() : String.format("%s application", applicationDependency.name());
+		application.setDescription(description);
+		application.setOwner(applicationDependency.owner());
+		application.setLabel(applicationDependency.label());
 		application.setDependencies(applicationDependency.dependencies());
 		application.setManagementDependencies(applicationDependency.managementDependencies());
 		Map<String, String> tags = new HashMap<>(applicationDependency.tags());

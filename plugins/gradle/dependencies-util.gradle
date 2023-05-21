@@ -1,15 +1,29 @@
 import groovy.json.JsonOutput
 
-if (!project.hasProperty('dependencyFileLocation')) {
-    project.ext.dependencyFileLocation = ""
+static def getDependencyFormatted(String group, String name, String version) {
+    return String.format("%s:%s:%s", group, name, version)
 }
 
-static def getDependencyFormatted(group, name, version) {
-    return group + ':' + name + ':' + version
+static def stringToLabel(String string) {
+    def name = string.replaceAll('[_-]', ' ').trim()
+    return name.substring(0, 1).toUpperCase() + name.substring(1)
+}
+
+def getApplicationDescription() {
+    return project.getProperties().getOrDefault('description', null)
+}
+
+def getApplicationExtProperty(String name, String defaultValue) {
+    return project.getProperties().getOrDefault('ext', Map.of()).getProperties().getOrDefault(name, defaultValue)
+}
+
+def getJavaVersion() {
+    return project.getSourceCompatibility().getMajorVersion()
+//    return JavaVersion.current().getMajorVersion()
 }
 
 def getFirstLevelModuleDependencies() {
-    return configurations.compileClasspath.resolvedConfiguration.getFirstLevelModuleDependencies().collect {
+    return configurations.runtimeClasspath.resolvedConfiguration.getFirstLevelModuleDependencies().collect {
 //        [
 //                groupId: it.getModuleGroup(),
 //                artifactId: it.getModuleName(),
@@ -20,31 +34,57 @@ def getFirstLevelModuleDependencies() {
 }
 
 def getManagementDependencies() {
+    if (!project.hasProperty('dependencyManagement')) {
+        return []
+    }
     return dependencyManagement.getPomConfigurer().dependencyManagement.importedBoms.collect {
         getDependencyFormatted(it.coordinates.groupId, it.coordinates.artifactId, it.coordinates.version)
     }
 }
 
-def getJson() {
+def getApplicationJson() {
     def dependencies = getFirstLevelModuleDependencies()
     def managementDependencies = getManagementDependencies()
 
-    def json = [
+    Map<String, Object> app = [
             name: project.getName(),
-            tags: [
-                    java: JavaVersion.current().toString(),
-                    gradle: project.getGradle().getGradleVersion()
-            ],
-            dependencies: dependencies,
-            managementDependencies: managementDependencies
+            label: getApplicationExtProperty('name', stringToLabel(project.getName()))
     ]
-    return json
+
+    // Description
+    String description = getApplicationDescription()
+    if (description != null) {
+        app.put('description', description)
+    }
+
+    // Owner
+    String owner = getApplicationExtProperty('ownerName', null)
+    if (owner != null) {
+        app.put('owner', owner)
+    }
+
+    app.put('tags', [
+            java: getJavaVersion(),
+            gradle: project.getGradle().getGradleVersion()
+    ])
+
+    if (dependencies.size() > 0) {
+        app.put('dependencies', dependencies)
+    }
+
+    if (managementDependencies.size() > 0) {
+        app.put('managementDependencies', managementDependencies)
+    }
+    return app
 }
 
 tasks.register('createDependencyFile') {
-    def dependencyJson = getJson()
-    File file = new File("${project.rootDir}/${dependencyFileLocation}" + dependencyJson.name + '.json')
-    file.write(JsonOutput.prettyPrint(JsonOutput.toJson(dependencyJson)))
+    doLast {
+        String dependencyFileLocation = getApplicationExtProperty('dependencyFileLocation', '')
+        Map<String, Object> dependencyJson = getApplicationJson()
+        File file = new File("${project.rootDir}/${dependencyFileLocation}" + dependencyJson.name + '.json')
+        file.write(JsonOutput.prettyPrint(JsonOutput.toJson(dependencyJson)))
+    }
 }
 
 //tasks.register('javaVersion') {
