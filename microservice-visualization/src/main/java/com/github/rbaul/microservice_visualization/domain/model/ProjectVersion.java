@@ -1,13 +1,9 @@
 package com.github.rbaul.microservice_visualization.domain.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,11 +27,19 @@ public class ProjectVersion {
 	@Id
 	@GeneratedValue
 	private Short id;
-	
+
 	@NotEmpty
+	@Column(unique = true)
 	private String name;
 	
 	private String description;
+
+	@NotEmpty
+	@Column(unique = true)
+	private String fullName;
+
+	@Embedded
+	private LoaderDetails loaderDetails;
 	
 	@ToString.Exclude
 	@OneToOne(fetch = FetchType.LAZY)

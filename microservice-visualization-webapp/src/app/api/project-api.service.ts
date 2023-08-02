@@ -1,7 +1,8 @@
+import { Page } from './../utils/page';
 import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ProjectDto } from './project-api.model';
+import { ProjectDto, ProjectLiteDto } from './project-api.model';
 
 
 const API_URL = '/api/v1/projects';
@@ -27,6 +28,11 @@ export class ProjectApiService {
 
   public delete(id: number): Observable<void> {
     return this.http.delete<void>(`${API_URL}/${id}`, httpOptions);
+  }
+
+  public getPageable(projectVersionId: number): Observable<Page<ProjectLiteDto>> {
+    return this.http.get<Page<ProjectLiteDto>>(`${API_URL}/search`,
+      { params: new HttpParams().set('projectVersionId', projectVersionId) });
   }
 
 }

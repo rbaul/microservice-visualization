@@ -31,8 +31,11 @@ export class ProjectsComponent implements OnInit {
   }
 
   selectProjectVersion(project: ProjectVersionDto) {
-    this.router.navigate([`projects/${project.id}`]);
+    this.router.navigate([`projects/${project.id}/versions`]);
   }
 
+  openDefaultVersion(project: ProjectVersionDto) {
+    this.router.navigate([`projects/${project.mainProject.id}`]);
+  }
 
 }

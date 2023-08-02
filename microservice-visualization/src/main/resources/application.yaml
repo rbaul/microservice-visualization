@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: projects-info
+    active: projects
   application:
     name: microservice-visualization
   datasource:
@@ -9,7 +9,7 @@ spring:
     driver-class-name: org.h2.Driver
 
   jpa:
-    show-sql: true
+    open-in-view: false
     hibernate:
       ddl-auto: create-drop
       naming:
@@ -17,7 +17,6 @@ spring:
 
   h2:
     console:
-      enabled: true
       path: /h2-console
 
   flyway:

@@ -1,0 +1,35 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
+
+  h2:
+    console:
+      enabled: true
+
+  flyway:
+    enabled: false
+
+  output:
+    ansi:
+      enabled: always
+
+microservice-visualization:
+  tags:
+    "org.springframework.boot:spring-boot-dependencies": Spring Boot
+    "org.springframework.cloud:spring-cloud-dependencies": Spring Cloud
+    "org.springframework.boot:spring-boot-starter-web": MVC
+    "org.springframework.boot:spring-boot-starter-amqp": RabbitMQ
+    "org.springframework.boot:spring-boot-starter-data-mongodb": MongoDB
+    "com.h2database:h2": H2
+  loaders:
+    local:
+      enabled: true
+      projects:
+        - name: Demo
+          description: Demo description
+          folder: "docker/demo-project"
+          default-version: 1.0.0

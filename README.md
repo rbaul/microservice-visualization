@@ -9,8 +9,8 @@ All Spring Boot (Java) applications has dependencies to other applications, that
 > * Maven (TODO)
 
 ## Build on
-* Java 17, Framework Spring Boot 3.0.x
-* Angular 15.2.x, Framework Angular Material
+* Java 17, Framework Spring Boot 3.1.x
+* Angular 15.2.x, PrimeNG
 * Gradle 7.6.1
 
 #### Microservice architecture demo
@@ -21,3 +21,24 @@ All Spring Boot (Java) applications has dependencies to other applications, that
 
 ##### Demo
 ![](demo/docs/demo.gif)
+
+##### Dev Run
+```
+spring.profiles.active=dev
+```
+
+##### Directory Structure of the project
+See [Demo Project](docker/demo-project)
+```
+    .
+    ├── 1.0.0                               # Version folder
+    |   ├── applications                    # Applications folder of the project
+    |   |   ├── application1.json           # Application dependcy json
+    |   |   ├── ...                 
+    |   |   └── applicationN.json
+    |   └── project-config.yaml             # Project configuration 
+    ├── 2.0.0                               # Version folder
+    ├── ...                   
+    └── N.0.0
+
+```

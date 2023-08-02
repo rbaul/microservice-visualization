@@ -1,5 +1,6 @@
 package com.github.rbaul.microservice_visualization.config;
 
+import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,44 +16,34 @@ import java.util.Map;
 @Setter
 @ConfigurationProperties(prefix = "microservice-visualization")
 public class MicroserviceVisualizationProperties {
-	
-	/**
-	 * Relevant Dependency tags
-	 */
-	private Map<String, String> tags = new HashMap<>();
-	
-	private List<MicroserviceVisualizationProject> projects = new ArrayList<>();
-	
-	@Getter
-	@Setter
-	public static class MicroserviceVisualizationProject {
-		private String name;
-		private String description;
-		private String pathLocation;
-		
-		private String applicationPostfix = "";
-		
-		private List<String> applicationApiPostfixes = List.of("-api");
-		
-		private List<MicroserviceVisualizationGroup> groups;
-		
-		private List<MicroserviceVisualizationOwner> owners;
-	}
-	
-	@Getter
-	@Setter
-	public static class MicroserviceVisualizationGroup {
-		private String name;
-		private String description;
-		private List<String> applicationNames;
-	}
-	
-	@Getter
-	@Setter
-	public static class MicroserviceVisualizationOwner {
-		private String name;
-		private String description;
-		private List<String> applicationNames;
-	}
-	
+
+    /**
+     * Relevant Dependency tags
+     */
+    private Map<String, String> tags = new HashMap<>();
+
+    /**
+     * Project loaders
+     */
+    private Map<ProjectLoaderType, ProjectLoader> loaders = new HashMap<>();
+
+    @Getter
+    @Setter
+    public static class ProjectDetails {
+        private String name;
+        private String description;
+        private String defaultVersion;
+        private String url;
+        private String project;
+        private String repo;
+        private String token;
+        private String folder;
+    }
+
+    @Getter
+    @Setter
+    public static class ProjectLoader {
+        private Boolean enabled = false;
+        private List<ProjectDetails> projects = new ArrayList<>();
+    }
 }

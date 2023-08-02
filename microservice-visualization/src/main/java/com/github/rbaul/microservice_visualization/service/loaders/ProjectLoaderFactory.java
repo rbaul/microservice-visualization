@@ -11,14 +11,14 @@ import java.util.Optional;
 @Slf4j
 @Service
 public class ProjectLoaderFactory {
-	private final Map<ProjectLoaderType, ProjectLoaderService> projectLoaderServiceMap = new HashMap<>();
-	
-	public ProjectLoaderFactory(List<ProjectLoaderService> projectLoaderServices) {
-		projectLoaderServices.forEach(projectLoaderService -> projectLoaderServiceMap.put(projectLoaderService.getType(), projectLoaderService));
-	}
-	
-	public Optional<ProjectLoaderService> getByType(ProjectLoaderType type) {
-		return Optional.ofNullable(projectLoaderServiceMap.get(type));
-	}
-	
+    private final Map<ProjectLoaderType, ProjectLoaderService> projectLoaderServiceMap = new HashMap<>();
+
+    public ProjectLoaderFactory(List<ProjectLoaderService> projectLoaderServices) {
+        projectLoaderServices.forEach(projectLoaderService -> projectLoaderServiceMap.put(projectLoaderService.getType(), projectLoaderService));
+    }
+
+    public Optional<ProjectLoaderService> getByType(ProjectLoaderType type) {
+        return Optional.ofNullable(projectLoaderServiceMap.get(type));
+    }
+
 }

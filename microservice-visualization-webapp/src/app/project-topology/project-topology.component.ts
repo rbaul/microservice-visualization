@@ -206,7 +206,8 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         });
 
         if (relevantGroups.length === 1) {
-          this.network.selectNodes(relevantGroups[0].applicationNames as IdType[])
+          const nodesInGroup: IdType[] = relevantGroups[0].applicationNames!.filter(app => this.network.findNode(app).length) as IdType[];
+          this.network.selectNodes(nodesInGroup);
         }
 
         // // If groupClusterDrugged
@@ -455,7 +456,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   calculateGroupSize(group: GroupCluster): GroupSize | undefined {
     if (!group.collapsed) {
 
-      const notHiddenInGroup = group.applicationNames!.filter(appName => !this.networkData?.nodes.get(appName).hidden);
+      const notHiddenInGroup = group.applicationNames!.filter(appName => !this.networkData?.nodes.get(appName)?.hidden);
 
       if (notHiddenInGroup.length > 0) {
         const nodePositions = this.network.getPositions(notHiddenInGroup);

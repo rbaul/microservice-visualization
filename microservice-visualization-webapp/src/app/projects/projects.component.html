@@ -1,6 +1,6 @@
 <p-table [value]="projects" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true" [rows]="10"
   [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-  [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="400px">
+  [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="90vh">
   <ng-template pTemplate="header">
     <tr>
       <th>Name</th>
@@ -13,7 +13,10 @@
       <td>{{ project.name }}</td>
       <td>{{ project.description }}</td>
       <td>
-        <button type="button" pButton pRipple icon="pi pi-angle-right" (click)="selectProjectVersion(project)"></button>
+        <div style="display: flex">
+          <button type="button" pButton pRipple icon="pi pi-angle-right" (click)="selectProjectVersion(project)"></button>
+          <button type="button" pButton pRipple icon="pi pi-external-link" (click)="openDefaultVersion(project)"></button>
+        </div>
       </td>
     </tr>
   </ng-template>

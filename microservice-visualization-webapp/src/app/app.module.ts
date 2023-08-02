@@ -10,15 +10,18 @@ import { PrimengModule } from './shared/primeng.module';
 import { HttpClientModule } from '@angular/common/http';
 import { ApplicationViewComponent } from './application-view/application-view.component';
 import { ProjectTopologyComponent } from './project-topology/project-topology.component';
+import { ProjectVersionsComponent } from './project-versions/project-versions.component';
+import { APP_BASE_HREF } from '@angular/common';
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     ProjectsComponent,
     ProjectViewComponent,
     ApplicationViewComponent,
-    ProjectTopologyComponent
-  ],
+    ProjectTopologyComponent,
+      ProjectVersionsComponent
+   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -27,7 +30,7 @@ import { ProjectTopologyComponent } from './project-topology/project-topology.co
     AppRoutingModule,
     PrimengModule
   ],
-  providers: [],
+  providers: [{provide: APP_BASE_HREF, useValue: '/ui'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

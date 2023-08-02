@@ -34,7 +34,10 @@ public class Project {
 	@Id
 	@GeneratedValue
 	private Short id;
-	
+
+	@NotEmpty
+	private String versionId;
+
 	@NotEmpty
 	private String version;
 	
@@ -61,9 +64,10 @@ public class Project {
 	
 	public void setApplications(List<Application> applications) {
 		if (!CollectionUtils.isEmpty(this.applications)) {
-			this.applications.forEach(this::removeApplication);
+			this.applications.forEach(application -> application.setProject(null));
+			this.applications.clear();
 		}
-		
+
 		if (!CollectionUtils.isEmpty(applications)) {
 			applications.forEach(this::addApplication);
 		}

@@ -1,0 +1,17 @@
+{
+    "name": "ordering",
+    "label": "Ordering",
+    "description": "Ordering application",
+    "owner": "Team 2",
+    "tags": {
+        "java": "17",
+        "gradle": "7.6.1"
+    },
+    "dependencies": [
+        "org.springframework.boot:spring-boot-starter-web:3.0.5",
+        "org.springframework.boot:spring-boot-starter-validation:3.0.5"
+    ],
+    "managementDependencies": [
+        "org.springframework.boot:spring-boot-dependencies:3.0.5"
+    ]
+}

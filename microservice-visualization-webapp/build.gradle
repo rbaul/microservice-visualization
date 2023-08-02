@@ -27,7 +27,7 @@ tasks.register('uiTest', NpmTask) {
 }
 
 tasks.register('webjar', Jar) {
-  from(fileTree('dist/webapp')) {
+  from(fileTree('dist/microservice-visualization-webapp')) {
     into 'META-INF/resources'
   }
 }

@@ -1,0 +1,23 @@
+{
+    "name": "customer",
+    "label": "Customer",
+    "description": "Customer application",
+    "owner": "Team 1",
+    "tags": {
+        "java": "17",
+        "gradle": "7.6.1"
+    },
+    "dependencies": [
+        "org.springframework.boot:spring-boot-starter-amqp:2.7.5",
+        "org.springframework.boot:spring-boot-starter-data-mongodb:2.7.5",
+        "org.springframework.boot:spring-boot-starter-validation:2.7.5",
+        "org.springframework.boot:spring-boot-starter-web:2.7.5",
+        "org.springdoc:springdoc-openapi-ui:1.6.15",
+        "org.modelmapper.extensions:modelmapper-spring:3.1.1",
+        "com.demo:basket-api:0.0.1-SNAPSHOT"
+    ],
+    "managementDependencies": [
+        "org.springframework.boot:spring-boot-dependencies:2.7.5",
+        "org.springframework.cloud:spring-cloud-dependencies:2021.0.5"
+    ]
+}
