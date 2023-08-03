@@ -24,7 +24,8 @@ public class NotifierController {
         log.info("Received bitbucket notification: '{}'", webHookDto);
         String repositoryName = webHookDto.repository().slug();
         WebHookDto.ChangeDto change = webHookDto.push().changes().get(0);
-        String projectName = webHookDto.repository().project().key().toLowerCase().substring(1);
+        String projectName = webHookDto.repository().project().key()
+                .replaceFirst("~", ""); // Fixed user private project
         ProjectNotificationType notificationType = null;
         String branchName = "";
         if (change.created()) { // Branch created
@@ -41,7 +42,5 @@ public class NotifierController {
             projectService.update(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
         }
 
-
     }
-
 }
