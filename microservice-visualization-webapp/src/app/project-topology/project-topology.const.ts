@@ -1,5 +1,5 @@
-import { NodeOptions } from "vis-network";
 import { Options } from "vis-network/standalone";
+import { NodeOptionsExtend } from "./vis-network-extend";
 
 export const SCALE_FACTORY = 0.1;
 
@@ -9,7 +9,7 @@ export const NODE_HEIGHT = 100;
 export const GROUP_MARGIN = 30;
 export const MOVE_TO_SCALE = 1.5;
 
-export const clusterNodeProperties: NodeOptions = {
+export const clusterNodeProperties: NodeOptionsExtend = {
     // borderWidth: 3,
     shape: 'box',
     mass: 1,
