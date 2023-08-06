@@ -1,4 +1,7 @@
 # Microservice Visualization by Dependencies
+
+[![Build Gradle](https://github.com/rbaul/microservice-visualization/actions/workflows/gradle.yml/badge.svg?branch=main)](https://github.com/rbaul/microservice-visualization/actions/workflows/gradle.yml)
+
 All Spring Boot (Java) applications has dependencies to other applications, that mean has some library of DTO (Data transfer Object) that common use in all applications that communicate with specific application. This way we can create microservice topology.
 #### Example
 > * Application: customer 
