@@ -4,6 +4,9 @@ FROM ibm-semeru-runtimes:open-17-jre
 RUN mkdir -p /app
 WORKDIR /app
 
+RUN pwd
+RUN ls
+
 ADD microservice-visualization/build/libs/microservice-visualization-*.jar app.jar
 
 CMD java -jar app.jar
