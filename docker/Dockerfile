@@ -5,7 +5,7 @@ RUN mkdir -p /app
 WORKDIR /app
 
 ADD https://github.com/rbaul/microservice-visualization/releases/download/0.0.1/microservice-visualization-0.0.1.jar microservice-visualization.jar
-COPY ../result result
+COPY /demo-project demo-project
 COPY application-projects.yaml application-projects.yaml
 
 CMD java -jar microservice-visualization.jar
