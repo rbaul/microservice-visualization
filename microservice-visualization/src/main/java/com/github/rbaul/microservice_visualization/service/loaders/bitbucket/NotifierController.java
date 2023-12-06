@@ -31,15 +31,21 @@ public class NotifierController {
         if (change.created()) { // Branch created
             notificationType = ProjectNotificationType.CREATED;
             branchName = change.neww().name();
-            projectService.create(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            if (change.neww().type() == WebHookDto.DiffType.BRANCH) {
+                projectService.create(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            }
         } else if (change.closed()) { // Branch deleted
             notificationType = ProjectNotificationType.DELETED;
             branchName = change.old().name();
-            projectService.delete(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            if (change.old().type() == WebHookDto.DiffType.BRANCH) {
+                projectService.delete(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            }
         } else { // Branch modified
             notificationType = ProjectNotificationType.MODIFIED;
             branchName = change.old().name();
-            projectService.update(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            if (change.old().type() == WebHookDto.DiffType.BRANCH) {
+                projectService.update(BitbucketConverterUtils.getFullName(projectName, repositoryName), branchName);
+            }
         }
 
     }
