@@ -143,8 +143,7 @@ public interface BitBucketV1Api {
 
         WebClient webClient = webClientBuilder.build();
 
-        HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory
-                .builder(WebClientAdapter.forClient(webClient))
+        HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(WebClientAdapter.create(webClient))
                 .build();
         return httpServiceProxyFactory.createClient(BitBucketV1Api.class);
     }

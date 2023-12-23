@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public abstract class ProjectLoaderService {
 
     public static final String APPLICATIONS_FOLDER = "applications";
+    public static final String LIBRARIES_FOLDER = "libraries";
     public static final String PROJECT_CONFIG_YAML = "project-config.yaml";
 
     protected final MicroserviceVisualizationProperties properties;
@@ -108,6 +109,7 @@ public abstract class ProjectLoaderService {
         String description = StringUtils.hasText(applicationDependency.description()) ?
                 applicationDependency.description() : String.format("%s application", applicationDependency.name());
         application.setDescription(description);
+        application.setLocation(applicationDependency.location());
         application.setOwner(applicationDependency.owner());
         application.setLabel(applicationDependency.label());
         application.setDependencies(applicationDependency.dependencies());

@@ -33,7 +33,11 @@ dependencies {
     // Model mapper
     implementation 'org.modelmapper.extensions:modelmapper-spring:3.1.+'
 
-    // WebApp
+	// GitHub
+	implementation 'org.kohsuke:github-api:1.318'
+
+
+	// WebApp
     implementation project(':microservice-visualization-webapp')
 
 	compileOnly 'org.projectlombok:lombok'

@@ -3,6 +3,7 @@ export interface ApplicationDto {
     name: string,
     label: string,
     description: string,
+    location: string,
     owner: string,
     tags: Map<String, String>,
     dependencies: string[],
@@ -14,6 +15,7 @@ export interface ApplicationLiteDto {
     name: string,
     label: string,
     description: string,
+    location: string,
     owner: string,
     tags: any
 }

@@ -30,6 +30,8 @@ public class Application {
 	private String label;
 	
 	private String description;
+
+	private String location;
 	
 	private String owner;
 	
