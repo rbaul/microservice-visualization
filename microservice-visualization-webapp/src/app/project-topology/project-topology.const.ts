@@ -17,14 +17,14 @@ export const clusterNodeProperties: NodeOptionsExtend = {
     heightConstraint: { minimum: 100, maximum: 100 },
     color: {
         border: 'gray',
-        background: '#9ccbb5',
+        background: '#c9ee9e',
         highlight: {
             border: '#2B7CE9',
-            background: '#459e74'
+            background: '#94eb30'
         },
         hover: {
             border: '#2B7CE9',
-            background: '#70b595'
+            background: '#7ac129'
         }
     },
     font: {
@@ -95,14 +95,14 @@ export const topologyOptions: Options = {
             heightConstraint: { minimum: 100, maximum: 100 },
             color: {
                 border: 'gray',
-                background: '#c5dcff',
+                background: '#d5e3ff',
                 highlight: {
                     border: '#2B7CE9',
-                    background: '#69a5fe'
+                    background: '#a6c2fb'
                 },
                 hover: {
                     border: '#2B7CE9',
-                    background: '#8dd0ff'
+                    background: '#79a4fb'
                 }
             },
             font: {
@@ -146,14 +146,14 @@ export const topologyOptions: Options = {
             heightConstraint: { minimum: 100, maximum: 100 },
             color: {
                 border: 'gray',
-                background: 'red',
+                background: '#e9e5ac',
                 highlight: {
                     border: '#2B7CE9',
-                    background: '#69a5fe'
+                    background: '#f7ea3a'
                 },
                 hover: {
                     border: '#2B7CE9',
-                    background: '#8dd0ff'
+                    background: '#e5da3f'
                 }
             },
             font: {
