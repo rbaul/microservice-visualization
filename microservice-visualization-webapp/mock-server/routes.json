@@ -1,4 +1,6 @@
 {
   "/api/v1/project-versions/search?page=*&size=*": "/project-versions-search",
-  "/api/v1/*": "/$1"
+  "/api/v1/project-versions/*": "/project-versions",
+  "/api/v1/projects/*": "/projects",
+  "/api/v1/applications/*": "/applications"
 }

@@ -243,6 +243,9 @@ export const topologyOptions: Options = {
     },
     manipulation: {
         enabled: false
+    },
+    layout: {
+        improvedLayout: false
     }
 };
 

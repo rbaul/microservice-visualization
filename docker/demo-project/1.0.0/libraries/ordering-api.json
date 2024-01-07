@@ -8,6 +8,7 @@
         "gradle": "7.6.1"
     },
     "dependencies": [
+        "org.demo:common-lib:1.0.0",
         "org.springframework.boot:spring-boot-starter-web:3.0.5",
         "org.springframework.boot:spring-boot-starter-validation:3.0.5"
     ],

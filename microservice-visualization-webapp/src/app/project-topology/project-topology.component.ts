@@ -1,10 +1,17 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ApplicationGroupDto, OwnerDto, ProjectDto } from '../api/project-api.model';
 
-import { Data, DataSet, Edge, IdType, Network, Node, Options, Position } from 'vis-network/standalone';
-import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
-import { topologyOptions, SCALE_FACTORY, COLLAPSED_NAME, GROUP_MARGIN, NODE_HEIGHT, NODE_WIDTH, MOVE_TO_SCALE } from './project-topology.const';
+import { ButtonModule } from 'primeng/button';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DataSet, IdType, Network } from 'vis-network/standalone';
+import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
+import { COLLAPSED_NAME, GROUP_MARGIN, MOVE_TO_SCALE, NODE_HEIGHT, NODE_WIDTH, SCALE_FACTORY, topologyOptions } from './project-topology.const';
 
 interface GroupCluster {
   id?: string,
@@ -27,6 +34,16 @@ interface GroupSize {
 
 @Component({
   selector: 'app-project-topology',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ToolbarModule,
+    MultiSelectModule,
+    DropdownModule,
+    FormsModule,
+    ButtonModule,
+    ContextMenuModule
+  ],
   templateUrl: './project-topology.component.html',
   styleUrls: ['./project-topology.component.scss'],
   encapsulation: ViewEncapsulation.None

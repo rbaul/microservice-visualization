@@ -5,69 +5,72 @@
   <div class="p-toolbar-group-end">
     <!-- <p-button (click)="sidebarVisible = true" icon="pi pi-arrow-right"></p-button> -->
     <p-selectButton [options]="toggleOptions" [(ngModel)]="toggle" optionLabel="icon">
-      <ng-template let-item>
+      <ng-template let-item pTemplate>
         <i [class]="item.icon"></i>
       </ng-template>
     </p-selectButton>
   </div>
 </p-toolbar>
 <!-- <div style="display: flex"> -->
-<ng-container *ngIf="toggle?.value">
-  <app-project-topology [data]="data"></app-project-topology>
-</ng-container>
 
-<ng-container *ngIf="!toggle?.value">
-  <p-table #dt1 dataKey="id" selectionMode="single" (onRowSelect)="onRowSelect($event)"
-    (onRowUnselect)="onRowUnselect($event)" [value]="data.applications" [tableStyle]="{ 'min-width': '50rem' }"
-    [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10, 25, 50]"
-    [scrollable]="true" scrollHeight="calc(90vh - 200px)" [styleClass]="'p-datatable-sm'"
-    [globalFilterFields]="globalFilterFields">
+@if(toggle && toggle.value) {
+<app-project-topology [data]="data"></app-project-topology>
+} @else {
+<p-table #dt1 dataKey="id" selectionMode="single" (onRowSelect)="onRowSelect($event)"
+  (onRowUnselect)="onRowUnselect($event)" [value]="data.applications" [tableStyle]="{ 'min-width': '50rem' }"
+  [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10, 25, 50]"
+  [scrollable]="true" scrollHeight="calc(90vh - 200px)" [styleClass]="'p-datatable-sm'"
+  [globalFilterFields]="globalFilterFields">
 
-    <ng-template pTemplate="caption">
-      <div class="flex">
-        <span class="p-input-icon-left ml-auto">
-          <i class="pi pi-search"></i>
-          <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
-            placeholder="Search keyword" />
-        </span>
-      </div>
-    </ng-template>
+  <ng-template pTemplate="caption">
+    <div class="flex">
+      <span class="p-input-icon-left ml-auto">
+        <i class="pi pi-search"></i>
+        <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
+          placeholder="Search keyword" />
+      </span>
+    </div>
+  </ng-template>
 
-    <ng-template pTemplate="header" let-app>
-      <tr>
-        <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon>
-        </th>
-        <th pSortableColumn="tags.{{tag}}" style="width:20%" *ngFor="let tag of tags">
-          {{tag}}
-          <p-sortIcon field="tags.{{tag}}"></p-sortIcon>
-        </th>
-        <th style="width: 5rem"></th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-app>
-      <tr>
-        <td>{{ app.name }}</td>
-        <td *ngFor="let tag of tags">
-          {{app.tags[tag]}}
-        </td>
-        <td>
-          <button type="button" pButton pRipple icon="pi pi-window-maximize" (click)="showApplication(app)"></button>
-        </td>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="summary">
-      <div class="flex align-items-center justify-content-between">
-        In total there are {{data.applications ? data.applications.length : 0 }} applications.
-      </div>
-    </ng-template>
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="7">No applications found.</td>
-      </tr>
-    </ng-template>
-  </p-table>
-</ng-container>
+  <ng-template pTemplate="header" let-app>
+    <tr>
+      <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon>
+      </th>
+      @for (tag of tags; track $index) {
+      <th pSortableColumn="tags.{{tag}}" style="width:20%">
+        {{tag}}
+        <p-sortIcon field="tags.{{tag}}"></p-sortIcon>
+      </th>
+      }
+      <th style="width: 5rem"></th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-app>
+    <tr>
+      <td>{{ app.name }}</td>
+      @for (tag of tags; track $index) {
+      <td>
+        {{app.tags[tag]}}
+      </td>
+      }
+      <td>
+        <button type="button" pButton pRipple icon="pi pi-window-maximize" (click)="showApplication(app)"></button>
+      </td>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+    <div class="flex align-items-center justify-content-between">
+      In total there are {{data.applications ? data.applications.length : 0 }} applications.
+    </div>
+  </ng-template>
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td colspan="7">No applications found.</td>
+    </tr>
+  </ng-template>
+</p-table>
+}
 
 <p-sidebar [(visible)]="sidebarVisible" position="right" fixedInViewport>
   <h3>Sidebar</h3>

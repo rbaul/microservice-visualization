@@ -1,19 +1,45 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { DialogModule } from 'primeng/dialog';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { ProjectApiService } from '../api/project-api.service';
 import { ActivatedRoute } from '@angular/router';
 import { ProjectDto } from '../api/project-api.model';
 import { ApplicationLiteDto } from '../api/application-api.model';
 import { ApplicationViewComponent } from '../application-view/application-view.component';
-import { Table } from 'primeng/table';
+import { TableModule } from 'primeng/table';
+import { ToolbarModule } from 'primeng/toolbar';
+import { CommonModule } from '@angular/common';
+import { ProjectTopologyComponent } from '../project-topology/project-topology.component';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { FormsModule } from '@angular/forms';
+import { SidebarModule } from 'primeng/sidebar';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-project-view',
+  standalone: true,
+  imports: [
+    CommonModule,
+    TableModule,
+    ToolbarModule,
+    SelectButtonModule,
+    FormsModule,
+    SidebarModule,
+    ProjectTopologyComponent,
+    DialogModule,
+    InputTextModule,
+    ButtonModule
+  ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.scss'],
   providers: [DialogService]
 })
 export class ProjectViewComponent implements OnInit, OnDestroy {
+
+  private activatedRoute = inject(ActivatedRoute);
+  public dialogService = inject(DialogService);
+  private projectApi = inject(ProjectApiService);
 
   data: ProjectDto = {
     id: 0,
@@ -36,12 +62,6 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   ref: DynamicDialogRef | undefined;
   selectedApplication: any;
   sidebarVisible: boolean = false;
-
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    public dialogService: DialogService,
-    private projectApi: ProjectApiService
-  ) { }
 
   ngOnInit(): void {
     this.globalFilterFields = this.tags.map(tag => `tags.${tag}`);

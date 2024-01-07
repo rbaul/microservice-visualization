@@ -1,14 +1,13 @@
 {
-    "name": "basket-api",
-    "label": "Basket API",
-    "description": "Basket application",
+    "name": "common-lib",
+    "label": "Common LIB",
+    "description": "Common library",
     "owner": "Team 1",
     "tags": {
         "java": "17",
         "gradle": "7.6.1"
     },
     "dependencies": [
-        "org.demo:common-lib:1.0.0",
         "org.springframework.boot:spring-boot-starter-amqp:2.7.10",
         "org.springframework.boot:spring-boot-starter-validation:2.7.10"
     ],

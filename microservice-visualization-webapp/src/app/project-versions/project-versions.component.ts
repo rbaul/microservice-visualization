@@ -2,26 +2,37 @@ import { ProjectVersionDto } from './../api/project-version-api.model';
 import { ProjectVersionApiService } from './../api/project-version-api.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProjectApiService } from './../api/project-api.service';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ProjectLiteDto } from '../api/project-api.model';
+import { CommonModule } from '@angular/common';
+import { ToolbarModule } from 'primeng/toolbar';
+import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-project-versions',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ToolbarModule,
+    TableModule,
+    InputTextModule,
+    ButtonModule
+  ],
   templateUrl: './project-versions.component.html',
   styleUrls: ['./project-versions.component.css']
 })
 export class ProjectVersionsComponent implements OnInit {
 
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
+  private projectApi = inject(ProjectApiService);
+  private projectVersionApi = inject(ProjectVersionApiService);
+
   data: ProjectVersionDto = new ProjectVersionDto();
 
   globalFilterFields: string[] = ['version'];
-
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private router: Router,
-    private projectApi: ProjectApiService,
-    private projectVersionApi: ProjectVersionApiService
-  ) { }
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(value => {

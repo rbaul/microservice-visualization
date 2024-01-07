@@ -21,7 +21,7 @@
 
 
     <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name" [showClear]="true"
-      (onClear)="clearAppFilter()" defaultLabel="Select relevant applications" display="chip"
+      (onClear)="clearAppFilter()" placeholder="Select relevant applications" display="chip"
       (onChange)="onFilterApps($event.value)">
     </p-multiSelect>
 
@@ -30,7 +30,7 @@
     </p-dropdown>
 
     <p-multiSelect [options]="ownerOptions" [(ngModel)]="selectedOwners" optionLabel="name" [showClear]="true"
-      (onClear)="clearAppFilter()" defaultLabel="Select relevant owners" display="chip"
+      (onClear)="clearAppFilter()" placeholder="Select relevant owners" display="chip"
       (onChange)="onFilterOwners($event.value)">
     </p-multiSelect>
   </div>
