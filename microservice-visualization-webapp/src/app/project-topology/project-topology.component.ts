@@ -2,7 +2,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, 
 import { ApplicationGroupDto, OwnerDto, ProjectDto } from '../api/project-api.model';
 
 import { Data, DataSet, Edge, IdType, Network, Node, Options, Position } from 'vis-network/standalone';
-import { ApplicationLiteDto } from '../api/application-api.model';
+import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
 import { MenuItem } from 'primeng/api';
 import { topologyOptions, SCALE_FACTORY, COLLAPSED_NAME, GROUP_MARGIN, NODE_HEIGHT, NODE_WIDTH, MOVE_TO_SCALE } from './project-topology.const';
 
@@ -83,7 +83,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.container = this.visNetworkContainer?.nativeElement;
     this.network = new Network(this.container, this.networkData, topologyOptions);
 
-    this.networkData.groups.forEach((group: GroupCluster) => {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
       this.network.cluster(group.clusterOptionsByData);
     });
 
@@ -268,9 +268,15 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
 
   ngOnChanges(changes: SimpleChanges) {
-    const nodeArray: any[] = this.data.applications.map((app: any) => {
-      return { id: app.name, label: this.getAppLabel(app), group: 'app' }; // TODO: groupId: 'Group Demo'
-    });
+    const nodeArray: any[] = this.data.applications
+      // .filter((app: ApplicationLiteDto) => app.type === ApplicationType.LIBRARY)
+      .map((app: ApplicationLiteDto) => {
+        if (app.type === ApplicationType.MICROSERVICE) {
+          return { id: app.name, label: this.getAppLabel(app), group: 'app' }; // TODO: groupId: 'Group Demo'
+        } else {
+          return { id: app.name, label: this.getAppLabel(app), group: 'lib' };
+        }
+      });
     this.apps = this.data.applications;
     if (this.data.owners) {
       this.ownerOptions = this.data.owners;
@@ -282,6 +288,20 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     const connections = this.data.connections;
     Object.keys(connections).forEach(key => {
       const to = connections[key];
+      if (to) {
+        to.forEach((t: any) => {
+          edges.push({
+            from: key,
+            to: t
+          });
+        });
+      }
+    });
+
+    // Dependencies
+    const dependencies = this.data.dependencies;
+    Object.keys(dependencies).forEach(key => {
+      const to = dependencies[key];
       if (to) {
         to.forEach((t: any) => {
           edges.push({

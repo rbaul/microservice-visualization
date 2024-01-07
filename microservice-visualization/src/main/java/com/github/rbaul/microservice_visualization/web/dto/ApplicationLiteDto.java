@@ -1,5 +1,6 @@
 package com.github.rbaul.microservice_visualization.web.dto;
 
+import com.github.rbaul.microservice_visualization.domain.model.ApplicationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class ApplicationLiteDto {
 	private String label;
 	
 	private String description;
+
+	private ApplicationType type;
 
 	private String location;
 	

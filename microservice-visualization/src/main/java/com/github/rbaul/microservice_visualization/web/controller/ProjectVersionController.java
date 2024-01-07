@@ -26,7 +26,7 @@ public class ProjectVersionController {
 	private final ProjectVersionService projectVersionService;
 	
 	@GetMapping("{id}")
-	public ProjectVersionDto get(@PathVariable int id) {
+	public ProjectVersionDto get(@PathVariable("id") int id) {
 		return projectVersionService.get(id);
 	}
 	
@@ -36,17 +36,17 @@ public class ProjectVersionController {
 	}
 	
 	@PutMapping("{id}")
-	public ProjectVersionDto update(@PathVariable int id, @RequestBody ProjectVersionDto projectDto) {
+	public ProjectVersionDto update(@PathVariable("id") int id, @RequestBody ProjectVersionDto projectDto) {
 		return null; //projectService.update(projectId, projectDto);
 	}
 	
 	@DeleteMapping("{id}")
-	public void delete(@PathVariable int id) {
+	public void delete(@PathVariable("id") int id) {
 		projectVersionService.delete(id);
 	}
 	
 	@GetMapping("search")
-	public Page<ProjectVersionDto> fetch(@RequestParam(required = false) String filter, @PageableDefault Pageable pageable) {
+	public Page<ProjectVersionDto> fetch(@RequestParam(required = false, name = "filter") String filter, @PageableDefault Pageable pageable) {
 		return projectVersionService.search(filter, pageable);
 	}
 }

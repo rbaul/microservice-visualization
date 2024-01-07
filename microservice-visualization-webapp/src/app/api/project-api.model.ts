@@ -21,6 +21,7 @@ export interface ProjectDto {
     owners?: OwnerDto[],
     // connections?: Map<String, String[]>,
     connections?: any,
+    dependencies?: any,
     projectVersion: ProjectVersionLiteDto
 }
 

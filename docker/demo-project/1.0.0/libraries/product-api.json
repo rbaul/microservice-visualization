@@ -1,0 +1,16 @@
+{
+    "name": "product-api",
+    "label": "Product API",
+    "description": "Product application",
+    "owner": "Team 3",
+    "tags": {
+        "java": "17",
+        "gradle": "7.6.1"
+    },
+    "dependencies": [
+        "org.springframework.boot:spring-boot-starter-validation:3.0.5"
+    ],
+    "managementDependencies": [
+        "org.springframework.boot:spring-boot-dependencies:3.0.5"
+    ]
+}

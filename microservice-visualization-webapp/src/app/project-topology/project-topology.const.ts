@@ -139,6 +139,57 @@ export const topologyOptions: Options = {
                 }
             }
         },
+        lib: {
+            shape: 'box',
+            mass: 1,
+            widthConstraint: { minimum: 200, maximum: 200 },
+            heightConstraint: { minimum: 100, maximum: 100 },
+            color: {
+                border: 'gray',
+                background: 'red',
+                highlight: {
+                    border: '#2B7CE9',
+                    background: '#69a5fe'
+                },
+                hover: {
+                    border: '#2B7CE9',
+                    background: '#8dd0ff'
+                }
+            },
+            font: {
+                multi: "html",
+                size: 10,
+                color: '#343434',
+                bold: { // <b>
+                    // color: '#343434',
+                    size: 16, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: 'bold'
+                },
+                ital: { // <i>
+                    color: 'grey',
+                    size: 14, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: 'italic',
+                },
+                boldital: { // <b><i>
+                    // color: '#343434',
+                    size: 12, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: ''
+                },
+                mono: { // <code>
+                    // color: '#343434',
+                    size: 8, // px
+                    face: 'courier new',
+                    vadjust: 0,
+                    mod: ''
+                }
+            }
+        },
         group: clusterNodeProperties,
         group_control: {
             shape: 'square',

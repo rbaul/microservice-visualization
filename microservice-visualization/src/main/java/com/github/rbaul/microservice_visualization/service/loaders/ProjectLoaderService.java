@@ -78,32 +78,54 @@ public abstract class ProjectLoaderService {
         Map<String, List<String>> appConnections = new HashMap<>();
         Map<String, String> apiNameToOwnerAppName = new HashMap<>();
 
-        project.getApplications().forEach(application -> {
-            String applicationNameWithoutPostfix = application.getName();
-            if (StringUtils.hasText(applicationPostfix)) {
-                applicationNameWithoutPostfix = applicationNameWithoutPostfix.substring(0, applicationNameWithoutPostfix.length() - applicationPostfix.length());
-            }
+        project.getApplications().stream()
+                .filter(application -> application.getType() == ApplicationType.MICROSERVICE).forEach(application -> {
+                    String applicationNameWithoutPostfix = application.getName();
+                    if (StringUtils.hasText(applicationPostfix)) {
+                        applicationNameWithoutPostfix = applicationNameWithoutPostfix.substring(0, applicationNameWithoutPostfix.length() - applicationPostfix.length());
+                    }
 
-            for (String applicationApiPostfix : applicationApiPostfixes) {
-                apiNameToOwnerAppName.put(applicationNameWithoutPostfix + applicationApiPostfix, application.getName());
-            }
+                    for (String applicationApiPostfix : applicationApiPostfixes) {
+                        apiNameToOwnerAppName.put(applicationNameWithoutPostfix + applicationApiPostfix, application.getName());
+                    }
 
-        });
+                });
 
-        project.getApplications().forEach(application -> application.getDependencies().forEach(dep -> {
-            Dependency dependency = ConverterUtils.convertDependency(dep);
-            if (apiNameToOwnerAppName.containsKey(dependency.name()) && !apiNameToOwnerAppName.get(dependency.name()).equals(application.getName())) {
-                if (!appConnections.containsKey(application.getName())) {
-                    appConnections.put(application.getName(), new ArrayList<>());
-                }
-                appConnections.get(application.getName()).add(apiNameToOwnerAppName.get(dependency.name()));
-            }
-        }));
+        project.getApplications().stream()
+                .filter(application -> application.getType() == ApplicationType.MICROSERVICE)
+                .forEach(application -> application.getDependencies().forEach(dep -> {
+                    Dependency dependency = ConverterUtils.convertDependency(dep);
+                    if (apiNameToOwnerAppName.containsKey(dependency.name()) && !apiNameToOwnerAppName.get(dependency.name()).equals(application.getName())) {
+                        if (!appConnections.containsKey(application.getName())) {
+                            appConnections.put(application.getName(), new ArrayList<>());
+                        }
+                        appConnections.get(application.getName()).add(apiNameToOwnerAppName.get(dependency.name()));
+                    }
+                }));
 
         return appConnections;
     }
 
-    protected Application convertApplicationDependencyToApplication(ApplicationDependency applicationDependency) {
+    protected Map<String, List<String>> createDependenciesMap(Project project) {
+        Map<String, List<String>> appConnections = new HashMap<>();
+        Set<String> appNames = project.getApplications().stream().map(Application::getName).collect(Collectors.toSet());
+
+        project.getApplications().forEach(application -> {
+            appConnections.put(application.getName(), new ArrayList<>());
+            if (application.getDependencies() != null) {
+                application.getDependencies().forEach(dep -> {
+                    Dependency dependency = ConverterUtils.convertDependency(dep);
+                    if (!application.getName().equals(dependency.name()) && appNames.contains(dependency.name())) {
+                        appConnections.get(application.getName()).add(dependency.name());
+                    }
+                });
+            }
+        });
+
+        return appConnections;
+    }
+
+    protected Application convertApplicationDependencyToApplication(ApplicationDependency applicationDependency, ApplicationType type) {
         Application application = new Application();
         application.setName(applicationDependency.name());
         String description = StringUtils.hasText(applicationDependency.description()) ?
@@ -124,6 +146,7 @@ public abstract class ProjectLoaderService {
         // Dependencies
         tags.putAll(findTags(applicationDependency.dependencies(), relevantTags));
         application.setTags(tags);
+        application.setType(type);
         return application;
     }
 
@@ -132,13 +155,15 @@ public abstract class ProjectLoaderService {
      */
     private Map<String, String> findTags(List<String> dependencies, Map<String, String> relevantTags) {
         Map<String, String> tags = new HashMap<>();
-        dependencies.forEach(dependencyString -> {
-            Dependency dependency = ConverterUtils.convertDependency(dependencyString);
-            String dependencyName = dependency.packageId() + dependency.name();
-            if (relevantTags.containsKey(dependencyName)) {
-                tags.put(relevantTags.get(dependencyName), dependency.version());
-            }
-        });
+        if (dependencies != null) {
+            dependencies.forEach(dependencyString -> {
+                Dependency dependency = ConverterUtils.convertDependency(dependencyString);
+                String dependencyName = dependency.packageId() + dependency.name();
+                if (relevantTags.containsKey(dependencyName)) {
+                    tags.put(relevantTags.get(dependencyName), dependency.version());
+                }
+            });
+        }
         return tags;
     }
 
@@ -169,6 +194,8 @@ public abstract class ProjectLoaderService {
         project.setApplications(applicationDependencies);
         // Connections
         project.setConnections(createTopology(project, projectConfig.getApplicationPostfix(), projectConfig.getApplicationApiPostfixes()));
+        // Dependencies
+        project.setDependencies(createDependenciesMap(project));
         if (!CollectionUtils.isEmpty(projectConfig.getGroups())) {
             List<ApplicationGroup> groups = getGroups(projectConfig.getGroups());
             List<ApplicationGroup> filteredGroups = groups.stream()

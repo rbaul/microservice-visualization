@@ -92,16 +92,16 @@ public interface BitBucketV1Api {
     /**
      * Get all applications by branch/tag
      */
-    default List<String> getAllApplicationsByBranch(String project, String repo, String branchId) {
-        return getFiles(project, repo, ProjectLoaderService.APPLICATIONS_FOLDER, MAX_LIMIT, branchId).getValues();
+    default List<String> getAllApplicationsByBranch(String project, String repo, String branchId, String folderName) {
+        return getFiles(project, repo, folderName, MAX_LIMIT, branchId).getValues();
     }
 
     /**
      * Get Application by Branch/Tag
      */
-    default String getApplicationByBranch(String project, String repo, String branchId, String fileName) {
+    default String getApplicationByBranch(String project, String repo, String branchId, String folder, String fileName) {
         return getFileContent(project, repo,
-                MessageFormat.format("{0}/{1}", ProjectLoaderService.APPLICATIONS_FOLDER, fileName), branchId);
+                MessageFormat.format("{0}/{1}", folder, fileName), branchId);
     }
 
     /**
