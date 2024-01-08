@@ -10,7 +10,8 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { SidebarModule } from 'primeng/sidebar';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
-import { ApplicationLiteDto } from '../api/application-api.model';
+import { TagModule } from 'primeng/tag';
+import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
 import { ProjectDto } from '../api/project-api.model';
 import { ProjectApiService } from '../api/project-api.service';
 import { ApplicationViewComponent } from '../application-view/application-view.component';
@@ -31,7 +32,8 @@ import { get } from 'lodash';
     ProjectTopologyComponent,
     DialogModule,
     InputTextModule,
-    ButtonModule
+    ButtonModule,
+    TagModule
   ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.scss'],
@@ -103,6 +105,10 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
 
   onRowUnselect($event: any) {
     console.log(`Row unselected ${JSON.stringify($event)}`)
+  }
+
+  isLibraryApp(app: ApplicationLiteDto): boolean {
+    return app.type === ApplicationType.LIBRARY;
   }
 
   customSort(event: any) {

@@ -49,7 +49,14 @@
   </ng-template>
   <ng-template pTemplate="body" let-app>
     <tr>
-      <td>{{ app.name }}</td>
+      <td>
+        {{ app.name }}
+        @if (isLibraryApp(app)) {
+          <p-tag value="{{app.type | lowercase}}" severity="warning"></p-tag>
+        } @else {
+          <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
+        }
+      </td>
       @for (tag of tags; track $index) {
       <td>
         {{app.tags[tag]}}
