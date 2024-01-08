@@ -19,6 +19,7 @@ interface GroupCluster {
   clusterOptionsByData?: any,
   collapsedNodeId?: string,
   collapsed?: boolean,
+  hidden?: boolean,
   description?: string,
   applicationNames?: string[],
   selected?: boolean,
@@ -68,6 +69,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   ownerOptions: OwnerDto[] = [];
   selectedOwners: OwnerDto[] = [];
 
+  // Types
+  typeOptions: ApplicationType[] = [ApplicationType.LIBRARY, ApplicationType.MICROSERVICE];
+  selectedTypes: ApplicationType[] = [];
+
   moveToAppOptions: ApplicationLiteDto[] = [];
 
   selectedApps: ApplicationLiteDto[] = [];
@@ -111,8 +116,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         let groupName: string = nodeId as string;
         const group = this.networkData.groups.get(this.convertGroupNodeIdToGroupId(groupName));
         if (group) {
-          group.collapsed = true;
-          this.network.cluster(group.clusterOptionsByData);
+          this.closeGroup(group);
           // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: true }]);
         }
       };
@@ -123,19 +127,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       if (nodeId) {
         const group: GroupCluster = this.networkData.groups.get(nodeId as string);
 
-        if (group && group.collapsed) {
-          group.collapsed = false;
-          (this.network as any).clustering.openCluster(group.name);
-          // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: false }]);
-          this.network.once('stabilized', event => {
-            this.networkData.groups.forEach((group: GroupCluster) => {
-              const groupSize = this.calculateGroupSize(group);
-              if (groupSize) {
-                this.network.moveNode(group.collapsedNodeId!, groupSize!.x + groupSize!.width, groupSize!.y);
-              }
-            });
-          });
-        }
+        this.openGroup(group);
       }
     });
 
@@ -284,6 +276,29 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   }
 
 
+  private closeGroup(group: any) {
+    group.collapsed = true;
+    group.hidden = false;
+    this.network.cluster(group.clusterOptionsByData);
+  }
+
+  private openGroup(group: GroupCluster) {
+    if (group && group.collapsed) {
+      group.collapsed = false;
+      group.hidden = true;
+      (this.network as any).clustering.openCluster(group.name);
+      // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: false }]);
+      this.network.once('stabilized', event => {
+        this.networkData.groups.forEach((group: GroupCluster) => {
+          const groupSize = this.calculateGroupSize(group);
+          if (groupSize) {
+            this.network.moveNode(group.collapsedNodeId!, groupSize!.x + groupSize!.width, groupSize!.y);
+          }
+        });
+      });
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
     const nodeArray: any[] = this.data.applications
       // .filter((app: ApplicationLiteDto) => app.type === ApplicationType.LIBRARY)
@@ -362,6 +377,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         name: group.name,
         clusterOptionsByData: clusterOptionsByData,
         collapsed: true,
+        hidden: false,
         collapsedNodeId: groupCollapsedNodeId,
         applicationNames: group.applicationNames,
         description: group.description,
@@ -419,7 +435,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       // Find 
       const notIncludedNodeIds: any[] = this.networkData.nodes.get({
         filter: (item: any) => {
-          return !neighborIds.includes(item.id);
+          return !neighborIds.includes(item.id) && item.group !== 'group_control';
         }
       });
 
@@ -427,15 +443,41 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         return { id: node.id, hidden: true };
       });
       this.networkData!.nodes.update(updateHiddenNodes);
+
     } else {
       this.moveToAppOptions = this.apps;
     }
+
+    // Hide groups
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      const groupHidden: boolean | undefined = group.applicationNames?.some(appName => this.networkData?.nodes.get(appName).hidden);
+      if (!group.hidden) {
+        if (groupHidden) {
+          group.collapsed = false;
+          (this.network as any).clustering.openCluster(group.name);
+
+          this.networkData!.nodes.update([{id: group.collapsedNodeId, hidden: true}]);
+        } else {
+          group.collapsed = true;
+          this.network.cluster(group.clusterOptionsByData);
+        }
+      } else {
+        this.networkData!.nodes.update([{id: group.collapsedNodeId, hidden: groupHidden}]);
+      }
+    });
+
     this.fit();
   }
 
   onFilterOwners(owners: OwnerDto[]): void {
     const ownerApplications = owners.flatMap((owner) => owner.applicationNames);
     const applictionsToShow = this.apps.filter((app) => ownerApplications.includes(app.name));
+    this.selectedApps = applictionsToShow;
+    this.onFilterApps(applictionsToShow);
+  }
+
+  onFilterTypes(types: ApplicationType[]): void {
+    const applictionsToShow = this.apps.filter((app) => types.includes(app.type));
     this.selectedApps = applictionsToShow;
     this.onFilterApps(applictionsToShow);
   }
@@ -520,6 +562,18 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       }
     }
     return undefined;
+  }
+
+  collapseAll(): void {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      this.openGroup(group);
+    });
+  }
+
+  uncollapseAll(): void {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      this.closeGroup(group);
+    });
   }
 
   /**

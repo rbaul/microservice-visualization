@@ -14,11 +14,11 @@
 <div #visNetworkContainer class="vis-network-canvas"></div>
 <p-toolbar class="network-toolbar" styleClass="vertical-align">
   <div class="p-toolbar-group-start">
-    <p-button icon="pi pi-arrows-alt" class="mr-2" (click)="fit()"></p-button>
-    <p-button icon="pi pi-search-plus" class="mr-2" (click)="zoomIn()"></p-button>
-    <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()"></p-button>
-
-
+    <p-button icon="pi pi-arrows-alt" class="mr-2" (click)="fit()" tooltipPosition="top" pTooltip="Fit to screen"></p-button>
+    <p-button icon="pi pi-search-plus" class="mr-2" (click)="zoomIn()" tooltipPosition="top" pTooltip="Zoom in"></p-button>
+    <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()" tooltipPosition="top" pTooltip="Zoom out"></p-button>
+    <p-button icon="pi pi-window-maximize" class="mr-2" (click)="collapseAll()" tooltipPosition="top" pTooltip="Collapse all"></p-button>
+    <p-button icon="pi pi-window-minimize" class="mr-2" (click)="uncollapseAll()" tooltipPosition="top" pTooltip="Uncollapse all"></p-button>
 
     <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name" [showClear]="true"
       (onClear)="clearAppFilter()" placeholder="Select relevant applications" display="chip"
@@ -32,6 +32,11 @@
     <p-multiSelect [options]="ownerOptions" [(ngModel)]="selectedOwners" optionLabel="name" [showClear]="true"
       (onClear)="clearAppFilter()" placeholder="Select relevant owners" display="chip"
       (onChange)="onFilterOwners($event.value)">
+    </p-multiSelect>
+
+    <p-multiSelect [options]="typeOptions" [(ngModel)]="selectedTypes" [showClear]="true"
+      (onClear)="clearAppFilter()" placeholder="Select relevant types" display="chip"
+      (onChange)="onFilterTypes($event.value)">
     </p-multiSelect>
   </div>
 </p-toolbar>
