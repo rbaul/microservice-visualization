@@ -8,16 +8,17 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SidebarModule } from 'primeng/sidebar';
-import { TableModule } from 'primeng/table';
-import { ToolbarModule } from 'primeng/toolbar';
+import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
 import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
 import { ProjectDto } from '../api/project-api.model';
 import { ProjectApiService } from '../api/project-api.service';
 import { ApplicationViewComponent } from '../application-view/application-view.component';
-import { ProjectTopologyComponent } from '../project-topology/project-topology.component';
+import { ProjectTopologyComponent, TopologyType } from '../project-topology/project-topology.component';
 
 import { get } from 'lodash';
+import { DropdownModule } from 'primeng/dropdown';
 
 @Component({
   selector: 'app-project-view',
@@ -33,7 +34,8 @@ import { get } from 'lodash';
     DialogModule,
     InputTextModule,
     ButtonModule,
-    TagModule
+    TagModule,
+    DropdownModule
   ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.scss'],
@@ -45,21 +47,29 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   public dialogService = inject(DialogService);
   private projectApi = inject(ProjectApiService);
 
+  public TopologyTypeEnum = TopologyType;
+
   data: ProjectDto = {
     id: 0,
     applications: [],
     projectVersion: {}
   };
 
+  types: AppType[] = [
+    {label: 'Library', value: ApplicationType.LIBRARY},
+    {label: 'Microservice', value: ApplicationType.MICROSERVICE}  
+  ];
+
   tags: string[] = ['java', 'Spring Boot', 'Spring Cloud', 'gradle'];
 
   globalFilterFields: string[] = [];
 
   toggleOptions: ToggleView[] = [
-    { icon: 'pi pi-table', value: false },
-    { icon: 'pi pi-share-alt', value: true }
+    { name: 'Table view', value: 1 },
+    { name: 'Microservices view', value: 2 },
+    { name: 'Dependecies view', value: 3 }
   ];
-  toggle: ToggleView = { icon: 'pi pi-table', value: false };
+  toggleValue: number = 1;
 
   visible: boolean = false;
 
@@ -68,8 +78,9 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   sidebarVisible: boolean = false;
 
   ngOnInit(): void {
-    this.globalFilterFields = this.tags.map(tag => `tags.${tag}`);
+    // this.globalFilterFields = this.tags.map(tag => `tags.${tag}`);
     this.globalFilterFields.push('name');
+    // this.globalFilterFields.push('type');
     this.activatedRoute.params.subscribe(value => {
       let projectId: number = value['id'];
       if (projectId) {
@@ -107,8 +118,12 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
     console.log(`Row unselected ${JSON.stringify($event)}`)
   }
 
-  isLibraryApp(app: ApplicationLiteDto): boolean {
-    return app.type === ApplicationType.LIBRARY;
+  isLibrary(appType: ApplicationType): boolean {
+    return appType === ApplicationType.LIBRARY;
+  }
+
+  clear(table: Table) {
+    table.clear();
   }
 
   customSort(event: any) {
@@ -132,6 +147,11 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
 }
 
 interface ToggleView {
-  value: boolean,
-  icon: string
+  value: number,
+  name: string
+}
+
+interface AppType {
+  value: ApplicationType,
+  label: string
 }

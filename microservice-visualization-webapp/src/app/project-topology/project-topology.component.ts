@@ -33,6 +33,12 @@ interface GroupSize {
   height: number
 }
 
+export enum TopologyType {
+  ALL,
+  MICROSERVICES,
+  DEPENDECIES
+}
+
 @Component({
   selector: 'app-project-topology',
   standalone: true,
@@ -52,6 +58,8 @@ interface GroupSize {
 export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input('data') data!: ProjectDto;
+
+  @Input() type: TopologyType = TopologyType.ALL;
 
   @ViewChild('visNetworkContainer', { static: false }) visNetworkContainer: ElementRef | any;
 
@@ -301,7 +309,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   ngOnChanges(changes: SimpleChanges) {
     const nodeArray: any[] = this.data.applications
-      // .filter((app: ApplicationLiteDto) => app.type === ApplicationType.LIBRARY)
+      .filter((app: ApplicationLiteDto) => {
+        return app.type === ApplicationType.MICROSERVICE || ((this.type === TopologyType.ALL || this.type === TopologyType.DEPENDECIES)
+         && app.type === ApplicationType.LIBRARY)
+      })
       .map((app: ApplicationLiteDto) => {
         if (app.type === ApplicationType.MICROSERVICE) {
           return { id: app.name, label: this.getAppLabel(app), group: 'app' }; // TODO: groupId: 'Group Demo'
@@ -317,32 +328,37 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.moveToAppOptions = this.data.applications;
 
     const edges: any[] = [];
-    const connections = this.data.connections;
-    Object.keys(connections).forEach(key => {
-      const to = connections[key];
-      if (to) {
-        to.forEach((t: any) => {
-          edges.push({
-            from: key,
-            to: t
+
+    if (this.type === TopologyType.ALL || this.type === TopologyType.MICROSERVICES) {
+      const connections = this.data.connections;
+      Object.keys(connections).forEach(key => {
+        const to = connections[key];
+        if (to) {
+          to.forEach((t: any) => {
+            edges.push({
+              from: key,
+              to: t
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
 
     // Dependencies
-    const dependencies = this.data.dependencies;
-    Object.keys(dependencies).forEach(key => {
-      const to = dependencies[key];
-      if (to) {
-        to.forEach((t: any) => {
-          edges.push({
-            from: key,
-            to: t
+    if (this.type === TopologyType.ALL || this.type === TopologyType.DEPENDECIES) {
+      const dependencies = this.data.dependencies;
+      Object.keys(dependencies).forEach(key => {
+        const to = dependencies[key];
+        if (to) {
+          to.forEach((t: any) => {
+            edges.push({
+              from: key,
+              to: t
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
 
     this.networkData = {
       nodes: new DataSet(nodeArray),
@@ -456,13 +472,13 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
           group.collapsed = false;
           (this.network as any).clustering.openCluster(group.name);
 
-          this.networkData!.nodes.update([{id: group.collapsedNodeId, hidden: true}]);
+          this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: true }]);
         } else {
           group.collapsed = true;
           this.network.cluster(group.clusterOptionsByData);
         }
       } else {
-        this.networkData!.nodes.update([{id: group.collapsedNodeId, hidden: groupHidden}]);
+        this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: groupHidden }]);
       }
     });
 

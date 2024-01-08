@@ -4,42 +4,60 @@
   </div>
   <div class="p-toolbar-group-end">
     <!-- <p-button (click)="sidebarVisible = true" icon="pi pi-arrow-right"></p-button> -->
-    <p-selectButton [options]="toggleOptions" [(ngModel)]="toggle" optionLabel="icon">
-      <ng-template let-item pTemplate>
-        <i [class]="item.icon"></i>
-      </ng-template>
-    </p-selectButton>
+    <p-selectButton [options]="toggleOptions" [(ngModel)]="toggleValue" optionLabel="name"
+      optionValue="value"></p-selectButton>
   </div>
 </p-toolbar>
 <!-- <div style="display: flex"> -->
 
-@if(toggle && toggle.value) {
-<app-project-topology [data]="data"></app-project-topology>
-} @else {
+@switch (toggleValue) {
+@case (1) {
 <p-table #dt1 dataKey="id" selectionMode="single" (onRowSelect)="onRowSelect($event)"
   (onRowUnselect)="onRowUnselect($event)" [value]="data.applications" [tableStyle]="{ 'min-width': '50rem' }"
-  [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
-  (sortFunction)="customSort($event)" [customSort]="true"
+  [paginator]="true" [rows]="10" [showCurrentPageReport]="true" (sortFunction)="customSort($event)" [customSort]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10, 25, 50]"
-  [scrollable]="true" scrollHeight="calc(90vh - 200px)" [styleClass]="'p-datatable-sm'"
+  [scrollable]="true" scrollHeight="calc(80vh - 200px)" [styleClass]="'p-datatable-sm'"
   [globalFilterFields]="globalFilterFields">
 
   <ng-template pTemplate="caption">
     <div class="flex">
+      <button pButton label="Clear" class="p-button-outlined" icon="pi pi-filter-slash" (click)="clear(dt1)"></button>
       <span class="p-input-icon-left ml-auto">
         <i class="pi pi-search"></i>
         <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
           placeholder="Search keyword" />
       </span>
     </div>
+
   </ng-template>
 
   <ng-template pTemplate="header" let-app>
     <tr>
-      <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon>
+      <th pSortableColumn="name">
+        <p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
+        Name
+        <p-sortIcon field="name"></p-sortIcon>
+      </th>
+      <th pSortableColumn="type">
+        <p-columnFilter field="type" matchMode="equals" display="menu">
+          <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+            <p-dropdown [ngModel]="value" [options]="types" (onChange)="filter($event.value)" placeholder="Any">
+              <ng-template let-option pTemplate="item">
+                @if (isLibrary(option.value)) {
+                <p-tag value="{{option.value | lowercase}}" severity="warning"></p-tag>
+                } @else {
+                <p-tag value="{{option.value | lowercase}}" severity="success"></p-tag>
+                }
+              </ng-template>
+            </p-dropdown>
+          </ng-template>
+        </p-columnFilter>
+        Type
+        <p-sortIcon field="type"></p-sortIcon>
       </th>
       @for (tag of tags; track $index) {
-      <th pSortableColumn="tags.{{tag}}" style="width:20%">
+      <th pSortableColumn="tags.{{tag}}">
+        <p-columnFilter type="text" field="tags.{{tag}}" display="menu"></p-columnFilter>
         {{tag}}
         <p-sortIcon field="tags.{{tag}}"></p-sortIcon>
       </th>
@@ -51,10 +69,12 @@
     <tr>
       <td>
         {{ app.name }}
-        @if (isLibraryApp(app)) {
-          <p-tag value="{{app.type | lowercase}}" severity="warning"></p-tag>
+      </td>
+      <td>
+        @if (isLibrary(app.type)) {
+        <p-tag value="{{app.type | lowercase}}" severity="warning"></p-tag>
         } @else {
-          <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
+        <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
         }
       </td>
       @for (tag of tags; track $index) {
@@ -78,6 +98,13 @@
     </tr>
   </ng-template>
 </p-table>
+}
+@case (2) {
+<app-project-topology [data]="data" [type]="TopologyTypeEnum.MICROSERVICES"></app-project-topology>
+}
+@case (3) {
+<app-project-topology [data]="data" [type]="TopologyTypeEnum.DEPENDECIES"></app-project-topology>
+}
 }
 
 <p-sidebar [(visible)]="sidebarVisible" position="right" fixedInViewport>
