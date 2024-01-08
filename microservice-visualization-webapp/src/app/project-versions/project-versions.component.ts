@@ -1,14 +1,15 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ToolbarModule } from 'primeng/toolbar';
+import { ProjectLiteDto } from '../api/project-api.model';
+import { ProjectApiService } from './../api/project-api.service';
 import { ProjectVersionDto } from './../api/project-version-api.model';
 import { ProjectVersionApiService } from './../api/project-version-api.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ProjectApiService } from './../api/project-api.service';
-import { Component, OnInit, inject } from '@angular/core';
-import { ProjectLiteDto } from '../api/project-api.model';
-import { CommonModule } from '@angular/common';
-import { ToolbarModule } from 'primeng/toolbar';
-import { TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-project-versions',
@@ -18,7 +19,8 @@ import { ButtonModule } from 'primeng/button';
     ToolbarModule,
     TableModule,
     InputTextModule,
-    ButtonModule
+    ButtonModule,
+    TagModule
   ],
   templateUrl: './project-versions.component.html',
   styleUrls: ['./project-versions.component.css']
