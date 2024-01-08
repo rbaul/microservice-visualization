@@ -1,20 +1,22 @@
-import { DialogModule } from 'primeng/dialog';
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ProjectApiService } from '../api/project-api.service';
+import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { ProjectDto } from '../api/project-api.model';
-import { ApplicationLiteDto } from '../api/application-api.model';
-import { ApplicationViewComponent } from '../application-view/application-view.component';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { SidebarModule } from 'primeng/sidebar';
 import { TableModule } from 'primeng/table';
 import { ToolbarModule } from 'primeng/toolbar';
-import { CommonModule } from '@angular/common';
+import { ApplicationLiteDto } from '../api/application-api.model';
+import { ProjectDto } from '../api/project-api.model';
+import { ProjectApiService } from '../api/project-api.service';
+import { ApplicationViewComponent } from '../application-view/application-view.component';
 import { ProjectTopologyComponent } from '../project-topology/project-topology.component';
-import { SelectButtonModule } from 'primeng/selectbutton';
-import { FormsModule } from '@angular/forms';
-import { SidebarModule } from 'primeng/sidebar';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
+
+import { get } from 'lodash';
 
 @Component({
   selector: 'app-project-view',
@@ -103,21 +105,23 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
     console.log(`Row unselected ${JSON.stringify($event)}`)
   }
 
-  // customSort(event: any) {
-  //   event.data.sort((data1: ApplicationLiteDto, data2: ApplicationLiteDto) => {
-  //     let value1 = data1.tags[event.field];
-  //     let value2 = data2.tags[event.field];
-  //     let result = null;
+  customSort(event: any) {
+    event.data.sort((data1: any, data2: any) => {
+      let value1 = get(data1, event.field);
+      let value2 = get(data2, event.field);
+      let result = null;
 
-  //     if (value1 == null && value2 != null) result = -1;
-  //     else if (value1 != null && value2 == null) result = 1;
-  //     else if (value1 == null && value2 == null) result = 0;
-  //     else if (typeof value1 === 'string' && typeof value2 === 'string') result = value1.localeCompare(value2);
-  //     else result = value1 < value2 ? -1 : value1 > value2 ? 1 : 0;
+      if (value1 == null && value2 != null) result = -1;
+      else if (value1 != null && value2 == null) result = 1;
+      else if (value1 == null && value2 == null) result = 0;
+      else if (typeof value1 === 'string' && typeof value2 === 'string') {
+        result = value1.localeCompare(value2, undefined, { numeric: true });
+      }
+      else result = value1 < value2 ? -1 : value1 > value2 ? 1 : 0;
 
-  //     return event.order * result;
-  //   });
-  // }
+      return event.order * result;
+    });
+  }
 
 }
 

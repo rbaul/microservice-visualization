@@ -19,6 +19,7 @@
 <p-table #dt1 dataKey="id" selectionMode="single" (onRowSelect)="onRowSelect($event)"
   (onRowUnselect)="onRowUnselect($event)" [value]="data.applications" [tableStyle]="{ 'min-width': '50rem' }"
   [paginator]="true" [rows]="10" [showCurrentPageReport]="true"
+  (sortFunction)="customSort($event)" [customSort]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10, 25, 50]"
   [scrollable]="true" scrollHeight="calc(90vh - 200px)" [styleClass]="'p-datatable-sm'"
   [globalFilterFields]="globalFilterFields">
