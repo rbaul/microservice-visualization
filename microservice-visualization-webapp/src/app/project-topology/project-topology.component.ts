@@ -3,9 +3,7 @@ import { ApplicationGroupDto, OwnerDto, ProjectDto } from '../api/project-api.mo
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { ContextMenuModule } from 'primeng/contextmenu';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ToolbarModule } from 'primeng/toolbar';
@@ -49,7 +47,7 @@ export enum TopologyType {
     DropdownModule,
     FormsModule,
     ButtonModule,
-    ContextMenuModule
+    // ContextMenuModule
   ],
   templateUrl: './project-topology.component.html',
   styleUrls: ['./project-topology.component.scss'],
@@ -89,19 +87,28 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   selectedNodes: string[] = [];
 
-  items: MenuItem[] = [];
+  // items: MenuItem[] = [];
 
-  selectedItems: MenuItem[] = [{
-    label: 'Show neighbors',
-    icon: 'pi pi-fw pi-file',
-    command: (event) => {
-      console.log(event);
-      const selectedNodes = this.network.getSelectedNodes();
-      if (selectedNodes.length > 0) {
-        this.showNeighbors(selectedNodes as string[]);
-      }
-    }
-  }];
+  // selectedItems: MenuItem[] = [{
+  //   label: 'Show neighbors',
+  //   icon: 'pi pi-fw pi-file',
+  //   command: (event) => {
+  //     const selectedNodes = this.network.getSelectedNodes();
+  //     if (selectedNodes.length > 0) {
+  //       this.showNeighbors(selectedNodes as string[]);
+  //     }
+  //   }
+  // },
+  // {
+  //   label: 'Show dependecies',
+  //   icon: 'pi pi-fw pi-file',
+  //   command: (event) => {
+  //     const selectedNodes = this.network.getSelectedNodes();
+  //     if (selectedNodes.length > 0) {
+  //       this.showDependecies(selectedNodes as string[]);
+  //     }
+  //   }
+  // }];
 
   constructor() { }
 
@@ -148,7 +155,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     // });
 
     this.network.on('oncontext', event => {
-      this.contextMenu.show();
+      this.contextMenu.show(event?.event);
       // this.groupClusters.forEach((value, key) => {
       //   value.collapsed = true;
       //   this.network.cluster(value.clusterOptionsByData);
@@ -170,7 +177,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         (this.networkData.groups.get(groupId) as GroupCluster).selected = true;
       });
 
-      this.items = this.selectedItems;
+      // this.items = this.selectedItems;
     });
 
     this.network.on('deselectNode', params => {
@@ -186,9 +193,9 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         (this.networkData.groups.get(groupId) as GroupCluster).selected = false;
       });
 
-      if (this.selectedNodes.length == 0) {
-        this.items = [];
-      }
+      // if (this.selectedNodes.length === 0) {
+      //   this.items = [];
+      // }
 
     });
 
@@ -311,7 +318,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     const nodeArray: any[] = this.data.applications
       .filter((app: ApplicationLiteDto) => {
         return app.type === ApplicationType.MICROSERVICE || ((this.type === TopologyType.ALL || this.type === TopologyType.DEPENDECIES)
-         && app.type === ApplicationType.LIBRARY)
+          && app.type === ApplicationType.LIBRARY)
       })
       .map((app: ApplicationLiteDto) => {
         if (app.type === ApplicationType.MICROSERVICE) {
@@ -438,6 +445,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
    * Dispaly only specific applications
    */
   onFilterApps(value: ApplicationLiteDto[]): void {
+    this.selectedApps = value;
     const ids: any[] = this.networkData.nodes.map((node: any) => {
       return { id: node.id, hidden: false };
     });
@@ -448,7 +456,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       const neighborIds: string[] = [];
       neighborIds.push(...nodeIds);
 
-      // Find 
+      // Find
       const notIncludedNodeIds: any[] = this.networkData.nodes.get({
         filter: (item: any) => {
           return !neighborIds.includes(item.id) && item.group !== 'group_control';
@@ -488,13 +496,11 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   onFilterOwners(owners: OwnerDto[]): void {
     const ownerApplications = owners.flatMap((owner) => owner.applicationNames);
     const applictionsToShow = this.apps.filter((app) => ownerApplications.includes(app.name));
-    this.selectedApps = applictionsToShow;
     this.onFilterApps(applictionsToShow);
   }
 
   onFilterTypes(types: ApplicationType[]): void {
     const applictionsToShow = this.apps.filter((app) => types.includes(app.type));
-    this.selectedApps = applictionsToShow;
     this.onFilterApps(applictionsToShow);
   }
 
@@ -515,6 +521,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   convertGroupNodeIdToGroupId(groupNodeId: string): string {
     return groupNodeId.substring(0, groupNodeId.length - COLLAPSED_NAME.length);
+  }
+
+  showNeighborsBySelectedNode(): void {
+    this.showNeighbors(this.selectedNodes)
   }
 
   /**
@@ -541,8 +551,44 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     neighborIds.push(...nodeIds);
 
     const showedNodes: ApplicationLiteDto[] = this.apps.filter(app => neighborIds.includes(app.name));
-    this.selectedApps = showedNodes;
-    this.onFilterApps(showedNodes)
+    this.onFilterApps(showedNodes);
+  }
+
+  showDependenciesBySelectedNode(): void {
+    this.showDependencies(this.selectedNodes)
+  }
+
+  /**
+   * Show all dependency tree of nodeId
+   */
+  showDependencies(nodeIds: string[]): void {
+    const showNodeIds: string[] = [];
+    // If Group add inner nodes
+    const groupNodes: GroupCluster[] = this.networkData.groups.get(nodeIds);
+    groupNodes.forEach(group => {
+      nodeIds.push(...group.applicationNames!);
+    });
+
+    nodeIds.forEach(nodeId => {
+      this.showDependenciesRecursive(nodeId, showNodeIds);
+    });
+
+    const showedNodes: ApplicationLiteDto[] = this.apps.filter(app => showNodeIds.includes(app.name));
+    this.onFilterApps(showedNodes);
+  }
+
+  showDependenciesRecursive(nodeId: string, relevantNodeIds: string[]): void {
+    // relevantNodeIds.push(nodeId);
+    // this.data.dependencies[nodeId]?.forEach((depId: string) => {
+    //   this.showDependenciesRecursive(depId, relevantNodeIds);
+    // });
+    relevantNodeIds.push(nodeId);
+    const edges = this.networkData.edges;
+    edges.forEach((edge: any) => {
+      if (nodeId === edge.from) {
+        this.showDependenciesRecursive(edge.to, relevantNodeIds);
+      }
+    });
   }
 
   /**
@@ -592,11 +638,12 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     });
   }
 
+
   /**
-   * Is context hidden
+   * Is node selected
    */
-  isContextHidden(): boolean {
-    return this.items.length == 0;
+  isNodeSelected(): boolean {
+    return this.selectedNodes.length === 0;
   }
 
   clearAppFilter(): void {
@@ -604,4 +651,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.onFilterApps(this.selectedApps);
   }
 
+  /**
+   * Is filter applied
+   */
+  isFilterApplied(): boolean {
+    return this.selectedApps.length === 0;
+  }
 }

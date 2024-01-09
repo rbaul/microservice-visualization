@@ -19,6 +19,10 @@
     <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()" tooltipPosition="top" pTooltip="Zoom out"></p-button>
     <p-button icon="pi pi-window-maximize" class="mr-2" (click)="collapseAll()" tooltipPosition="top" pTooltip="Collapse all"></p-button>
     <p-button icon="pi pi-window-minimize" class="mr-2" (click)="uncollapseAll()" tooltipPosition="top" pTooltip="Uncollapse all"></p-button>
+    <p-button icon="pi pi-share-alt" [disabled]="isNodeSelected()" class="mr-2" (click)="showDependenciesBySelectedNode()" tooltipPosition="top" pTooltip="Show dependencies"></p-button>
+    <p-button icon="pi pi-link" [disabled]="isNodeSelected()" class="mr-2" (click)="showNeighborsBySelectedNode()" tooltipPosition="top" pTooltip="Show neighbors"></p-button>
+    <p-button icon="pi pi-filter-slash" [disabled]="isFilterApplied()" class="mr-2" (click)="clearAppFilter()" tooltipPosition="top" pTooltip="Clear filters"></p-button>
+
 
     <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name" [showClear]="true"
       (onClear)="clearAppFilter()" placeholder="Select relevant applications" display="chip"
@@ -47,4 +51,4 @@
   </ng-template>
 </p-overlayPanel> -->
 
-<p-contextMenu #contextMenu [model]="items" [target]="visNetworkContainer" [hidden]="isContextHidden()"></p-contextMenu>
+<!-- <p-contextMenu #contextMenu [model]="items" [target]="visNetworkContainer" [hidden]="isContextHidden()"></p-contextMenu> -->
