@@ -1,3 +1,5 @@
+$fontColor: rgba(255, 255, 255, 0.87);
+
 p-table {
     width: 100%;
 }
@@ -12,4 +14,9 @@ app-project-topology {
 
 .center {
     text-align: center;
+}
+
+.name-link {
+    color: $fontColor;
+    text-decoration: none;
 }

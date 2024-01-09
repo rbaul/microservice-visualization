@@ -68,7 +68,7 @@
   <ng-template pTemplate="body" let-app>
     <tr>
       <td>
-        {{ app.name }}
+        <a class="name-link" href="{{ app.location }}" target="_blank">{{ app.name }}</a>
       </td>
       <td>
         @if (isLibrary(app.type)) {
