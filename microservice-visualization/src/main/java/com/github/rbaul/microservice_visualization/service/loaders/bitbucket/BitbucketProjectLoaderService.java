@@ -3,6 +3,7 @@ package com.github.rbaul.microservice_visualization.service.loaders.bitbucket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.Application;
+import com.github.rbaul.microservice_visualization.domain.model.ApplicationType;
 import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderService;
@@ -13,6 +14,7 @@ import com.github.rbaul.microservice_visualization.utils.BitbucketConverterUtils
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,16 +49,31 @@ public class BitbucketProjectLoaderService extends ProjectLoaderService {
     }
 
     private Project getProjectByVersion(LoaderDetails loaderDetails, String versionId, String version, BitBucketV1Api api) {
-        ProjectConfig projectConfigByBranch = getProjectConfig(api.getProjectConfigByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId));
-        List<String> allApplicationsByBranch = api.getAllApplicationsByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId);
         Project project = new Project();
-        List<Application> applicationDependencies = allApplicationsByBranch.stream().map(applicationFileName ->
-                        convertApplicationDependencyToApplication(getApplicationDependency(api.getApplicationByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, applicationFileName))))
-                .collect(Collectors.toList());
+        ProjectConfig projectConfigByBranch = getProjectConfig(api.getProjectConfigByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId));
 
+        List<Application> applicationDependencies = getApplicationsByFolder(loaderDetails, versionId, api, ProjectLoaderService.APPLICATIONS_FOLDER, ApplicationType.MICROSERVICE);
 
-        setApplicationToProject(project, projectConfigByBranch, applicationDependencies, versionId, version);
+        List<Application> libraryDependencies = getApplicationsByFolder(loaderDetails, versionId, api, ProjectLoaderService.LIBRARIES_FOLDER, ApplicationType.LIBRARY);
+
+        List<Application> dependencies = new ArrayList<>(applicationDependencies);
+        dependencies.addAll(libraryDependencies);
+
+        setApplicationToProject(project, projectConfigByBranch, dependencies, versionId, version);
         return project;
+    }
+
+    private List<Application> getApplicationsByFolder(LoaderDetails loaderDetails, String versionId, BitBucketV1Api api, String folderName, ApplicationType appType) {
+        try {
+            List<String> allApplicationsByBranch = api.getAllApplicationsByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName);
+            return allApplicationsByBranch.stream().map(applicationFileName ->
+                            convertApplicationDependencyToApplication(getApplicationDependency(api.getApplicationByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName, applicationFileName)),
+                                    appType))
+                    .toList();
+        } catch (Exception e) {
+            log.error("Failed load folder: '{}'", folderName, e);
+            return List.of();
+        }
     }
 
     @Override

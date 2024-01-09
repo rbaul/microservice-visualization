@@ -18,7 +18,7 @@ public class ApplicationController {
 	private final ApplicationService applicationService;
 	
 	@GetMapping("{id}")
-	public ApplicationFullDto get(@PathVariable int id) {
+	public ApplicationFullDto get(@PathVariable("id") int id) {
 		return applicationService.get(id);
 	}
 	

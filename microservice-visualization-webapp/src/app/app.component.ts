@@ -1,17 +1,25 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { ToolbarModule } from 'primeng/toolbar';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    ToolbarModule,
+    ButtonModule
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'Microservice Visualization by Dependencies';
+  router = inject(Router);
 
-  constructor(
-    private router: Router
-  ) { }
+  title = 'Microservice Visualization by Dependencies';
 
   navigateHome() {
     this.router.navigate(['projects']);

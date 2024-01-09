@@ -1,10 +1,15 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewEncapsulation, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ApplicationGroupDto, OwnerDto, ProjectDto } from '../api/project-api.model';
 
-import { Data, DataSet, Edge, IdType, Network, Node, Options, Position } from 'vis-network/standalone';
-import { ApplicationLiteDto } from '../api/application-api.model';
-import { MenuItem } from 'primeng/api';
-import { topologyOptions, SCALE_FACTORY, COLLAPSED_NAME, GROUP_MARGIN, NODE_HEIGHT, NODE_WIDTH, MOVE_TO_SCALE } from './project-topology.const';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ToolbarModule } from 'primeng/toolbar';
+import { DataSet, IdType, Network } from 'vis-network/standalone';
+import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
+import { COLLAPSED_NAME, GROUP_MARGIN, MOVE_TO_SCALE, NODE_HEIGHT, NODE_WIDTH, SCALE_FACTORY, topologyOptions } from './project-topology.const';
 
 interface GroupCluster {
   id?: string,
@@ -12,6 +17,7 @@ interface GroupCluster {
   clusterOptionsByData?: any,
   collapsedNodeId?: string,
   collapsed?: boolean,
+  hidden?: boolean,
   description?: string,
   applicationNames?: string[],
   selected?: boolean,
@@ -25,8 +31,24 @@ interface GroupSize {
   height: number
 }
 
+export enum TopologyType {
+  ALL,
+  MICROSERVICES,
+  DEPENDECIES
+}
+
 @Component({
   selector: 'app-project-topology',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ToolbarModule,
+    MultiSelectModule,
+    DropdownModule,
+    FormsModule,
+    ButtonModule,
+    // ContextMenuModule
+  ],
   templateUrl: './project-topology.component.html',
   styleUrls: ['./project-topology.component.scss'],
   encapsulation: ViewEncapsulation.None
@@ -34,6 +56,8 @@ interface GroupSize {
 export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input('data') data!: ProjectDto;
+
+  @Input() type: TopologyType = TopologyType.ALL;
 
   @ViewChild('visNetworkContainer', { static: false }) visNetworkContainer: ElementRef | any;
 
@@ -51,6 +75,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   ownerOptions: OwnerDto[] = [];
   selectedOwners: OwnerDto[] = [];
 
+  // Types
+  typeOptions: ApplicationType[] = [ApplicationType.LIBRARY, ApplicationType.MICROSERVICE];
+  selectedTypes: ApplicationType[] = [];
+
   moveToAppOptions: ApplicationLiteDto[] = [];
 
   selectedApps: ApplicationLiteDto[] = [];
@@ -59,19 +87,28 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   selectedNodes: string[] = [];
 
-  items: MenuItem[] = [];
+  // items: MenuItem[] = [];
 
-  selectedItems: MenuItem[] = [{
-    label: 'Show neighbors',
-    icon: 'pi pi-fw pi-file',
-    command: (event) => {
-      console.log(event);
-      const selectedNodes = this.network.getSelectedNodes();
-      if (selectedNodes.length > 0) {
-        this.showNeighbors(selectedNodes as string[]);
-      }
-    }
-  }];
+  // selectedItems: MenuItem[] = [{
+  //   label: 'Show neighbors',
+  //   icon: 'pi pi-fw pi-file',
+  //   command: (event) => {
+  //     const selectedNodes = this.network.getSelectedNodes();
+  //     if (selectedNodes.length > 0) {
+  //       this.showNeighbors(selectedNodes as string[]);
+  //     }
+  //   }
+  // },
+  // {
+  //   label: 'Show dependecies',
+  //   icon: 'pi pi-fw pi-file',
+  //   command: (event) => {
+  //     const selectedNodes = this.network.getSelectedNodes();
+  //     if (selectedNodes.length > 0) {
+  //       this.showDependecies(selectedNodes as string[]);
+  //     }
+  //   }
+  // }];
 
   constructor() { }
 
@@ -83,7 +120,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.container = this.visNetworkContainer?.nativeElement;
     this.network = new Network(this.container, this.networkData, topologyOptions);
 
-    this.networkData.groups.forEach((group: GroupCluster) => {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
       this.network.cluster(group.clusterOptionsByData);
     });
 
@@ -94,8 +131,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         let groupName: string = nodeId as string;
         const group = this.networkData.groups.get(this.convertGroupNodeIdToGroupId(groupName));
         if (group) {
-          group.collapsed = true;
-          this.network.cluster(group.clusterOptionsByData);
+          this.closeGroup(group);
           // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: true }]);
         }
       };
@@ -106,19 +142,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       if (nodeId) {
         const group: GroupCluster = this.networkData.groups.get(nodeId as string);
 
-        if (group && group.collapsed) {
-          group.collapsed = false;
-          (this.network as any).clustering.openCluster(group.name);
-          // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: false }]);
-          this.network.once('stabilized', event => {
-            this.networkData.groups.forEach((group: GroupCluster) => {
-              const groupSize = this.calculateGroupSize(group);
-              if (groupSize) {
-                this.network.moveNode(group.collapsedNodeId!, groupSize!.x + groupSize!.width, groupSize!.y);
-              }
-            });
-          });
-        }
+        this.openGroup(group);
       }
     });
 
@@ -131,7 +155,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     // });
 
     this.network.on('oncontext', event => {
-      this.contextMenu.show();
+      this.contextMenu.show(event?.event);
       // this.groupClusters.forEach((value, key) => {
       //   value.collapsed = true;
       //   this.network.cluster(value.clusterOptionsByData);
@@ -153,7 +177,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         (this.networkData.groups.get(groupId) as GroupCluster).selected = true;
       });
 
-      this.items = this.selectedItems;
+      // this.items = this.selectedItems;
     });
 
     this.network.on('deselectNode', params => {
@@ -169,9 +193,9 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         (this.networkData.groups.get(groupId) as GroupCluster).selected = false;
       });
 
-      if (this.selectedNodes.length == 0) {
-        this.items = [];
-      }
+      // if (this.selectedNodes.length === 0) {
+      //   this.items = [];
+      // }
 
     });
 
@@ -267,10 +291,42 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   }
 
 
+  private closeGroup(group: any) {
+    group.collapsed = true;
+    group.hidden = false;
+    this.network.cluster(group.clusterOptionsByData);
+  }
+
+  private openGroup(group: GroupCluster) {
+    if (group && group.collapsed) {
+      group.collapsed = false;
+      group.hidden = true;
+      (this.network as any).clustering.openCluster(group.name);
+      // this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: false }]);
+      this.network.once('stabilized', event => {
+        this.networkData.groups.forEach((group: GroupCluster) => {
+          const groupSize = this.calculateGroupSize(group);
+          if (groupSize) {
+            this.network.moveNode(group.collapsedNodeId!, groupSize!.x + groupSize!.width, groupSize!.y);
+          }
+        });
+      });
+    }
+  }
+
   ngOnChanges(changes: SimpleChanges) {
-    const nodeArray: any[] = this.data.applications.map((app: any) => {
-      return { id: app.name, label: this.getAppLabel(app), group: 'app' }; // TODO: groupId: 'Group Demo'
-    });
+    const nodeArray: any[] = this.data.applications
+      .filter((app: ApplicationLiteDto) => {
+        return app.type === ApplicationType.MICROSERVICE || ((this.type === TopologyType.ALL || this.type === TopologyType.DEPENDECIES)
+          && app.type === ApplicationType.LIBRARY)
+      })
+      .map((app: ApplicationLiteDto) => {
+        if (app.type === ApplicationType.MICROSERVICE) {
+          return { id: app.name, label: this.getAppLabel(app), group: 'app' }; // TODO: groupId: 'Group Demo'
+        } else {
+          return { id: app.name, label: this.getAppLabel(app), group: 'lib' };
+        }
+      });
     this.apps = this.data.applications;
     if (this.data.owners) {
       this.ownerOptions = this.data.owners;
@@ -279,18 +335,37 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.moveToAppOptions = this.data.applications;
 
     const edges: any[] = [];
-    const connections = this.data.connections;
-    Object.keys(connections).forEach(key => {
-      const to = connections[key];
-      if (to) {
-        to.forEach((t: any) => {
-          edges.push({
-            from: key,
-            to: t
+
+    if (this.type === TopologyType.ALL || this.type === TopologyType.MICROSERVICES) {
+      const connections = this.data.connections;
+      Object.keys(connections).forEach(key => {
+        const to = connections[key];
+        if (to) {
+          to.forEach((t: any) => {
+            edges.push({
+              from: key,
+              to: t
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
+
+    // Dependencies
+    if (this.type === TopologyType.ALL || this.type === TopologyType.DEPENDECIES) {
+      const dependencies = this.data.dependencies;
+      Object.keys(dependencies).forEach(key => {
+        const to = dependencies[key];
+        if (to) {
+          to.forEach((t: any) => {
+            edges.push({
+              from: key,
+              to: t
+            });
+          });
+        }
+      });
+    }
 
     this.networkData = {
       nodes: new DataSet(nodeArray),
@@ -325,6 +400,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         name: group.name,
         clusterOptionsByData: clusterOptionsByData,
         collapsed: true,
+        hidden: false,
         collapsedNodeId: groupCollapsedNodeId,
         applicationNames: group.applicationNames,
         description: group.description,
@@ -369,6 +445,7 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
    * Dispaly only specific applications
    */
   onFilterApps(value: ApplicationLiteDto[]): void {
+    this.selectedApps = value;
     const ids: any[] = this.networkData.nodes.map((node: any) => {
       return { id: node.id, hidden: false };
     });
@@ -379,10 +456,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
       const neighborIds: string[] = [];
       neighborIds.push(...nodeIds);
 
-      // Find 
+      // Find
       const notIncludedNodeIds: any[] = this.networkData.nodes.get({
         filter: (item: any) => {
-          return !neighborIds.includes(item.id);
+          return !neighborIds.includes(item.id) && item.group !== 'group_control';
         }
       });
 
@@ -390,16 +467,40 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
         return { id: node.id, hidden: true };
       });
       this.networkData!.nodes.update(updateHiddenNodes);
+
     } else {
       this.moveToAppOptions = this.apps;
     }
+
+    // Hide groups
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      const groupHidden: boolean | undefined = group.applicationNames?.some(appName => this.networkData?.nodes.get(appName).hidden);
+      if (!group.hidden) {
+        if (groupHidden) {
+          group.collapsed = false;
+          (this.network as any).clustering.openCluster(group.name);
+
+          this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: true }]);
+        } else {
+          group.collapsed = true;
+          this.network.cluster(group.clusterOptionsByData);
+        }
+      } else {
+        this.networkData!.nodes.update([{ id: group.collapsedNodeId, hidden: groupHidden }]);
+      }
+    });
+
     this.fit();
   }
 
   onFilterOwners(owners: OwnerDto[]): void {
     const ownerApplications = owners.flatMap((owner) => owner.applicationNames);
     const applictionsToShow = this.apps.filter((app) => ownerApplications.includes(app.name));
-    this.selectedApps = applictionsToShow;
+    this.onFilterApps(applictionsToShow);
+  }
+
+  onFilterTypes(types: ApplicationType[]): void {
+    const applictionsToShow = this.apps.filter((app) => types.includes(app.type));
     this.onFilterApps(applictionsToShow);
   }
 
@@ -420,6 +521,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   convertGroupNodeIdToGroupId(groupNodeId: string): string {
     return groupNodeId.substring(0, groupNodeId.length - COLLAPSED_NAME.length);
+  }
+
+  showNeighborsBySelectedNode(): void {
+    this.showNeighbors(this.selectedNodes)
   }
 
   /**
@@ -446,8 +551,44 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     neighborIds.push(...nodeIds);
 
     const showedNodes: ApplicationLiteDto[] = this.apps.filter(app => neighborIds.includes(app.name));
-    this.selectedApps = showedNodes;
-    this.onFilterApps(showedNodes)
+    this.onFilterApps(showedNodes);
+  }
+
+  showDependenciesBySelectedNode(): void {
+    this.showDependencies(this.selectedNodes)
+  }
+
+  /**
+   * Show all dependency tree of nodeId
+   */
+  showDependencies(nodeIds: string[]): void {
+    const showNodeIds: string[] = [];
+    // If Group add inner nodes
+    const groupNodes: GroupCluster[] = this.networkData.groups.get(nodeIds);
+    groupNodes.forEach(group => {
+      nodeIds.push(...group.applicationNames!);
+    });
+
+    nodeIds.forEach(nodeId => {
+      this.showDependenciesRecursive(nodeId, showNodeIds);
+    });
+
+    const showedNodes: ApplicationLiteDto[] = this.apps.filter(app => showNodeIds.includes(app.name));
+    this.onFilterApps(showedNodes);
+  }
+
+  showDependenciesRecursive(nodeId: string, relevantNodeIds: string[]): void {
+    // relevantNodeIds.push(nodeId);
+    // this.data.dependencies[nodeId]?.forEach((depId: string) => {
+    //   this.showDependenciesRecursive(depId, relevantNodeIds);
+    // });
+    relevantNodeIds.push(nodeId);
+    const edges = this.networkData.edges;
+    edges.forEach((edge: any) => {
+      if (nodeId === edge.from) {
+        this.showDependenciesRecursive(edge.to, relevantNodeIds);
+      }
+    });
   }
 
   /**
@@ -485,11 +626,24 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     return undefined;
   }
 
+  collapseAll(): void {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      this.openGroup(group);
+    });
+  }
+
+  uncollapseAll(): void {
+    this.networkData?.groups.forEach((group: GroupCluster) => {
+      this.closeGroup(group);
+    });
+  }
+
+
   /**
-   * Is context hidden
+   * Is node selected
    */
-  isContextHidden(): boolean {
-    return this.items.length == 0;
+  isNodeSelected(): boolean {
+    return this.selectedNodes.length === 0;
   }
 
   clearAppFilter(): void {
@@ -497,4 +651,10 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
     this.onFilterApps(this.selectedApps);
   }
 
+  /**
+   * Is filter applied
+   */
+  isFilterApplied(): boolean {
+    return this.selectedApps.length === 0;
+  }
 }

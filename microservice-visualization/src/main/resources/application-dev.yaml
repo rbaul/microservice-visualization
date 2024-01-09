@@ -26,10 +26,19 @@ microservice-visualization:
     "org.springframework.boot:spring-boot-starter-data-mongodb": MongoDB
     "com.h2database:h2": H2
   loaders:
-    local:
+#    local:
+#      enabled: true
+#      projects:
+#        - name: Demo
+#          description: Demo description
+#          folder: "docker/demo-project"
+#          default-version: 1.0.0
+    github:
       enabled: true
       projects:
-        - name: Demo
-          description: Demo description
-          folder: "docker/demo-project"
-          default-version: 1.0.0
+        - name: Demo Github project
+          description: Demo project description
+          project: rbaul
+          repo: microservice-visualization-demo-project
+          default-version: main
+          token:

@@ -1,101 +1,309 @@
 {
   "project-versions-search": {
-    "content": [{
-      "id": 1,
-      "name": "Demo",
-      "description": "Demo description",
-      "mainProject": {
+    "content": [
+      {
         "id": 1,
-        "version": "1.0.0"
-      },
-      "projects": [{
-        "id": 1,
-        "version": "1.0.0"
-      }]
-    }],
+        "name": "Demo",
+        "description": "Demo description",
+        "mainProject": {
+          "id": 2,
+          "version": "1.0.0"
+        },
+        "projects": [
+          {
+            "id": 1,
+            "version": "2.0.0"
+          },
+          {
+            "id": 2,
+            "version": "1.0.0"
+          }
+        ]
+      }
+    ],
     "pageable": {
-      "sort": {
-        "empty": true,
-        "sorted": false,
-        "unsorted": true
-      },
-      "offset": 0,
       "pageNumber": 0,
       "pageSize": 10,
+      "sort": {
+        "empty": true,
+        "unsorted": true,
+        "sorted": false
+      },
+      "offset": 0,
       "paged": true,
       "unpaged": false
     },
-    "last": true,
     "totalPages": 1,
     "totalElements": 1,
+    "last": true,
     "size": 10,
     "number": 0,
     "sort": {
       "empty": true,
-      "sorted": false,
-      "unsorted": true
+      "unsorted": true,
+      "sorted": false
     },
-    "first": true,
     "numberOfElements": 1,
+    "first": true,
     "empty": false
   },
-  "projects": [{
+  "project-versions": {
     "id": 1,
-    "version": "1.0.0",
-    "applications": [{
-      "id": 1,
-      "name": "ordering",
-      "tags": {
-        "gradle": "7.6.1",
-        "java": "17",
-        "Spring Boot": "3.0.5",
-        "MVC": "3.0.5"
-      }
-    }, {
-      "id": 3,
-      "name": "basket",
-      "tags": {
-        "gradle": "7.6.1",
-        "RabbitMQ": "2.7.10",
-        "java": "17",
-        "Spring Boot": "2.7.10",
-        "MVC": "2.7.10",
-        "Spring Cloud": "2022.0.2"
-      }
-    }, {
-      "id": 4,
-      "name": "product",
-      "tags": {
-        "gradle": "7.6.1",
-        "RabbitMQ": "3.0.5",
-        "java": "17",
-        "Spring Boot": "3.0.5",
-        "MVC": "3.0.5"
-      }
-    }, {
+    "name": "Demo",
+    "description": "Demo description",
+    "mainProject": {
       "id": 2,
-      "name": "customer",
-      "tags": {
-        "gradle": "7.6.1",
-        "RabbitMQ": "2.7.5",
-        "java": "17",
-        "Spring Boot": "2.7.5",
-        "MVC": "2.7.5",
-        "Spring Cloud": "2021.0.5"
-      }
-    }],
-    "connections": {
-      "customer": ["basket"]
+      "version": "1.0.0"
     },
-    "groups": [{
-      "name": "Group Demo",
-      "description": "Group Demo description",
-      "applicationNames": ["basket", "ordering"]
-    }],
+    "projects": [
+      {
+        "id": 1,
+        "version": "2.0.0"
+      },
+      {
+        "id": 2,
+        "version": "1.0.0"
+      }
+    ]
+  },
+  "projects": {
+    "id": 2,
+    "version": "1.0.0",
+    "applications": [
+      {
+        "id": 17,
+        "name": "ordering",
+        "label": "Ordering",
+        "description": "Ordering application",
+        "type": "MICROSERVICE",
+        "location": null,
+        "owner": "Team 2",
+        "tags": {
+          "gradle": "7.6.1",
+          "java": "17",
+          "Spring Boot": "3.0.5",
+          "MVC": "3.0.5"
+        }
+      },
+      {
+        "id": 13,
+        "name": "product-api",
+        "label": "Product API",
+        "description": "Product application",
+        "type": "LIBRARY",
+        "location": null,
+        "owner": "Team 3",
+        "tags": {
+          "gradle": "7.6.1",
+          "java": "17",
+          "Spring Boot": "3.0.5"
+        }
+      },
+      {
+        "id": 14,
+        "name": "customer-api",
+        "label": "Customer API",
+        "description": "Customer application",
+        "type": "LIBRARY",
+        "location": null,
+        "owner": "Team 1",
+        "tags": {
+          "gradle": "7.6.1",
+          "java": "17",
+          "Spring Boot": "2.7.5",
+          "MVC": "2.7.5",
+          "Spring Cloud": "2021.0.5"
+        }
+      },
+      {
+        "id": 15,
+        "name": "ordering-api",
+        "label": "Ordering API",
+        "description": "Ordering application",
+        "type": "LIBRARY",
+        "location": null,
+        "owner": "Team 2",
+        "tags": {
+          "gradle": "7.6.1",
+          "java": "17",
+          "Spring Boot": "3.0.5",
+          "MVC": "3.0.5"
+        }
+      },
+      {
+        "id": 11,
+        "name": "basket-api",
+        "label": "Basket API",
+        "description": "Basket application",
+        "type": "LIBRARY",
+        "location": null,
+        "owner": "Team 1",
+        "tags": {
+          "gradle": "7.6.1",
+          "RabbitMQ": "2.7.10",
+          "java": "17",
+          "Spring Boot": "2.7.10",
+          "Spring Cloud": "2022.0.2"
+        }
+      },
+      {
+        "id": 9,
+        "name": "basket",
+        "label": "Basket",
+        "description": "Basket application",
+        "type": "MICROSERVICE",
+        "location": null,
+        "owner": "Team 1",
+        "tags": {
+          "gradle": "7.6.1",
+          "RabbitMQ": "2.7.10",
+          "java": "17",
+          "Spring Boot": "2.7.10",
+          "H2": "2.1.214",
+          "MVC": "2.7.10",
+          "Spring Cloud": "2022.0.2"
+        }
+      },
+      {
+        "id": 10,
+        "name": "product",
+        "label": "Product",
+        "description": "Product application",
+        "type": "MICROSERVICE",
+        "location": null,
+        "owner": "Team 3",
+        "tags": {
+          "gradle": "7.6.1",
+          "RabbitMQ": "3.0.5",
+          "java": "17",
+          "Spring Boot": "3.0.5",
+          "MongoDB": "3.0.5",
+          "MVC": "3.0.5"
+        }
+      },
+      {
+        "id": 12,
+        "name": "common-lib",
+        "label": "Common LIB",
+        "description": "Common library",
+        "type": "LIBRARY",
+        "location": null,
+        "owner": "Team 1",
+        "tags": {
+          "gradle": "7.6.1",
+          "RabbitMQ": "2.7.10",
+          "java": "17",
+          "Spring Boot": "2.7.10",
+          "Spring Cloud": "2022.0.2"
+        }
+      },
+      {
+        "id": 16,
+        "name": "customer",
+        "label": "Customer",
+        "description": "Customer application",
+        "type": "MICROSERVICE",
+        "location": null,
+        "owner": "Team 1",
+        "tags": {
+          "gradle": "7.6.1",
+          "RabbitMQ": "2.7.5",
+          "java": "17",
+          "Spring Boot": "2.7.5",
+          "MongoDB": "2.7.5",
+          "MVC": "2.7.5",
+          "Spring Cloud": "2021.0.5"
+        }
+      }
+    ],
+    "connections": {
+      "customer": [
+        "basket"
+      ]
+    },
+    "dependencies": {
+      "basket": [
+        "basket-api"
+      ],
+      "product": [],
+      "customer-api": [
+        "common-lib"
+      ],
+      "ordering": [],
+      "ordering-api": [
+        "common-lib"
+      ],
+      "product-api": [
+        "common-lib"
+      ],
+      "common-lib": [],
+      "basket-api": [
+        "common-lib"
+      ],
+      "customer": [
+        "basket-api"
+      ]
+    },
+    "groups": [
+      {
+        "name": "Group Demo",
+        "description": "Group Demo description",
+        "applicationNames": [
+          "basket",
+          "ordering"
+        ]
+      }
+    ],
+    "owners": [
+      {
+        "name": "Team 1",
+        "description": "Team 1 - NY",
+        "applicationNames": [
+          "basket",
+          "customer"
+        ]
+      },
+      {
+        "name": "Team 2",
+        "description": "Team 2 - TLV",
+        "applicationNames": [
+          "product",
+          "ordering"
+        ]
+      }
+    ],
     "projectVersion": {
       "id": 1,
       "name": "Demo",
       "description": "Demo description"
     }
-  }]
+  },
+  "applications": {
+    "id": 8,
+    "name": "product",
+    "label": "Product",
+    "description": "Product application",
+    "type": "MICROSERVICE",
+    "location": null,
+    "owner": "Team 3",
+    "tags": {
+      "gradle": "7.6.1",
+      "RabbitMQ": "3.0.5",
+      "java": "17",
+      "Spring Boot": "3.0.5",
+      "MongoDB": "3.0.5",
+      "MVC": "3.0.5"
+    },
+    "dependencies": [
+      "org.springframework.boot:spring-boot-starter-amqp:3.0.5",
+      "org.springframework.boot:spring-boot-starter-data-mongodb:3.0.5",
+      "org.springframework.boot:spring-boot-starter-validation:3.0.5",
+      "org.springframework.boot:spring-boot-starter-web:3.0.5",
+      "org.springdoc:springdoc-openapi-ui:1.6.15",
+      "org.modelmapper.extensions:modelmapper-spring:3.1.1"
+    ],
+    "managementDependencies": [
+      "org.springframework.boot:spring-boot-dependencies:3.0.5"
+    ]
+  }
 }

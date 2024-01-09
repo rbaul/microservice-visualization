@@ -19,7 +19,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping("{id}")
-    public ProjectDto get(@PathVariable int id) {
+    public ProjectDto get(@PathVariable("id") int id) {
         return projectService.get(id);
     }
 
@@ -29,17 +29,17 @@ public class ProjectController {
     }
 
     @PutMapping("{id}")
-    public ProjectDto update(@PathVariable int id, @RequestBody ProjectDto projectDto) {
+    public ProjectDto update(@PathVariable("id") int id, @RequestBody ProjectDto projectDto) {
         return null; //projectService.update(projectId, projectDto);
     }
 
     @DeleteMapping("{id}")
-    public void delete(@PathVariable int id) {
+    public void delete(@PathVariable("id") int id) {
         projectService.delete(id);
     }
 
     @GetMapping("search")
-    public Page<ProjectLiteDto> fetch(@RequestParam int projectVersionId,
+    public Page<ProjectLiteDto> fetch(@RequestParam("projectVersionId") int projectVersionId,
                                       @PageableDefault Pageable pageable) {
         return projectService.search(projectVersionId, pageable);
     }

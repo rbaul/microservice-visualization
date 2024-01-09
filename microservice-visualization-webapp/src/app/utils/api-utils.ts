@@ -1,4 +1,4 @@
-import { HttpParams } from '@angular/common/http';
+import { HttpHeaders, HttpParams } from '@angular/common/http';
 
 export class ApiUtils {
     public static getPageableHttpParams(pageSize: number, pageNumber: number,
@@ -11,3 +11,9 @@ export class ApiUtils {
         return httpParams;
     }
 }
+
+export const httpJsonOptions = {
+    headers: new HttpHeaders({
+        'Content-Type': 'application/json'
+    })
+};

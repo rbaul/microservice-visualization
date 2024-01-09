@@ -3,6 +3,7 @@ package com.github.rbaul.microservice_visualization.service.loaders.local;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.Application;
+import com.github.rbaul.microservice_visualization.domain.model.ApplicationType;
 import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderService;
@@ -11,7 +12,6 @@ import com.github.rbaul.microservice_visualization.service.model.ApplicationDepe
 import com.github.rbaul.microservice_visualization.service.model.ProjectConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -48,15 +49,23 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
         Project project = new Project();
         String dir = MessageFormat.format("{0}/{1}", loaderDetails.getFolder(), versionId);
         ProjectConfig projectConfiguration = getProjectConfiguration(Paths.get(MessageFormat.format("{0}/{1}", dir, PROJECT_CONFIG_YAML)));
-        Path folder = Paths.get(MessageFormat.format("{0}/{1}", dir, APPLICATIONS_FOLDER));
+        List<Application> applicationDependencies = getApplicationsByType(dir, APPLICATIONS_FOLDER, ApplicationType.MICROSERVICE);
+        List<Application> libraryDependencies = getApplicationsByType(dir, LIBRARIES_FOLDER, ApplicationType.LIBRARY);
+        List<Application> dependencies = new ArrayList<>(applicationDependencies);
+        dependencies.addAll(libraryDependencies);
+
+        setApplicationToProject(project, projectConfiguration, dependencies, versionId, version);
+        return project;
+    }
+
+    private List<Application> getApplicationsByType(String dir, String applicationsFolder, ApplicationType type) {
+        Path folder = Paths.get(MessageFormat.format("{0}/{1}", dir, applicationsFolder));
 
         File[] listApplicationFiles = folder.toFile().listFiles(File::isFile);
-        List<Application> applicationDependencies = listApplicationFiles == null ? List.of() : Arrays.stream(listApplicationFiles).map(file -> getApplication(Paths.get(file.toURI())))
+        return listApplicationFiles == null ? List.of() : Arrays.stream(listApplicationFiles)
+                .map(file -> getApplication(Paths.get(file.toURI()), type))
                 .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        setApplicationToProject(project, projectConfiguration, applicationDependencies, versionId, version);
-        return project;
+                .toList();
     }
 
     @Override
@@ -87,11 +96,12 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
         }
     }
 
-    protected Application getApplication(Path path) {
+    protected Application getApplication(Path path, ApplicationType type) {
         ApplicationDependency applicationDependency = getApplicationDependency(path);
         if (applicationDependency != null) {
-            return convertApplicationDependencyToApplication(applicationDependency);
+            return convertApplicationDependencyToApplication(applicationDependency, type);
         }
         return null;
     }
+
 }

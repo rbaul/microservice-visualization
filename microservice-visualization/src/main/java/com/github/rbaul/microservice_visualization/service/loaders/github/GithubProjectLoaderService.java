@@ -3,6 +3,7 @@ package com.github.rbaul.microservice_visualization.service.loaders.github;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.Application;
+import com.github.rbaul.microservice_visualization.domain.model.ApplicationType;
 import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderService;
@@ -17,6 +18,7 @@ import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -67,23 +69,35 @@ public class GithubProjectLoaderService extends ProjectLoaderService {
 
             ProjectConfig projectConfigByBranch = getProjectConfig(fileContent.getContent());
 
-            List<GHContent> directoryContent = projectRepository.getDirectoryContent(ProjectLoaderService.APPLICATIONS_FOLDER, versionId);
+            List<Application> applicationDependencies = getApplicationsByFolder(projectRepository, versionId, ProjectLoaderService.APPLICATIONS_FOLDER, ApplicationType.MICROSERVICE);
+            List<Application> libraryDependencies = getApplicationsByFolder(projectRepository, versionId, ProjectLoaderService.LIBRARIES_FOLDER, ApplicationType.LIBRARY);
+            List<Application> dependencies = new ArrayList<>(applicationDependencies);
+            dependencies.addAll(libraryDependencies);
+            setApplicationToProject(project, projectConfigByBranch, dependencies, versionId, version);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return project;
+    }
 
-            List<Application> applicationDependencies = directoryContent.stream().map(ghContent -> {
+    private List<Application> getApplicationsByFolder(GHRepository projectRepository, String versionId, String folderName, ApplicationType appType) {
+        try {
+            List<GHContent> directoryContent = projectRepository.getDirectoryContent(folderName, versionId);
+
+            return directoryContent.stream().map(ghContent -> {
                         try {
                             String encodedContent = projectRepository.getFileContent(ghContent.getPath(), versionId).getContent();
-                            return convertApplicationDependencyToApplication(getApplicationDependency(encodedContent));
+                            return convertApplicationDependencyToApplication(getApplicationDependency(encodedContent), appType);
                         } catch (IOException e) {
                             log.error("Failed retrieve content of '{}'", ghContent.getPath(), e);
                             return null;
                         }
                     }).filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-            setApplicationToProject(project, projectConfigByBranch, applicationDependencies, versionId, version);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+                    .toList();
+        } catch (Exception e) {
+            log.error("Failed load folder: '{}'", folderName, e);
+            return List.of();
         }
-        return project;
     }
 
     @Override

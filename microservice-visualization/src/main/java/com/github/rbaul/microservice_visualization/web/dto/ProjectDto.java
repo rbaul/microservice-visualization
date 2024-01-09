@@ -22,6 +22,8 @@ public class ProjectDto {
 	private List<ApplicationLiteDto> applications;
 	
 	private Map<String, List<String>> connections;
+
+	private Map<String, List<String>> dependencies;
 	
 	private List<ApplicationGroupDto> groups;
 	

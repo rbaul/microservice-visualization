@@ -17,14 +17,14 @@ export const clusterNodeProperties: NodeOptionsExtend = {
     heightConstraint: { minimum: 100, maximum: 100 },
     color: {
         border: 'gray',
-        background: '#9ccbb5',
+        background: '#c9ee9e',
         highlight: {
             border: '#2B7CE9',
-            background: '#459e74'
+            background: '#94eb30'
         },
         hover: {
             border: '#2B7CE9',
-            background: '#70b595'
+            background: '#7ac129'
         }
     },
     font: {
@@ -95,14 +95,65 @@ export const topologyOptions: Options = {
             heightConstraint: { minimum: 100, maximum: 100 },
             color: {
                 border: 'gray',
-                background: '#c5dcff',
+                background: '#d5e3ff',
                 highlight: {
                     border: '#2B7CE9',
-                    background: '#69a5fe'
+                    background: '#a6c2fb'
                 },
                 hover: {
                     border: '#2B7CE9',
-                    background: '#8dd0ff'
+                    background: '#79a4fb'
+                }
+            },
+            font: {
+                multi: "html",
+                size: 10,
+                color: '#343434',
+                bold: { // <b>
+                    // color: '#343434',
+                    size: 16, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: 'bold'
+                },
+                ital: { // <i>
+                    color: 'grey',
+                    size: 14, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: 'italic',
+                },
+                boldital: { // <b><i>
+                    // color: '#343434',
+                    size: 12, // px
+                    face: 'arial',
+                    vadjust: 0,
+                    mod: ''
+                },
+                mono: { // <code>
+                    // color: '#343434',
+                    size: 8, // px
+                    face: 'courier new',
+                    vadjust: 0,
+                    mod: ''
+                }
+            }
+        },
+        lib: {
+            shape: 'box',
+            mass: 1,
+            widthConstraint: { minimum: 200, maximum: 200 },
+            heightConstraint: { minimum: 100, maximum: 100 },
+            color: {
+                border: 'gray',
+                background: '#e9e5ac',
+                highlight: {
+                    border: '#2B7CE9',
+                    background: '#f7ea3a'
+                },
+                hover: {
+                    border: '#2B7CE9',
+                    background: '#e5da3f'
                 }
             },
             font: {
@@ -192,6 +243,9 @@ export const topologyOptions: Options = {
     },
     manipulation: {
         enabled: false
+    },
+    layout: {
+        improvedLayout: false
     }
 };
 

@@ -15,7 +15,13 @@ export interface ApplicationLiteDto {
     name: string,
     label: string,
     description: string,
+    type: ApplicationType,
     location: string,
     owner: string,
     tags: any
+}
+
+export enum ApplicationType {
+    MICROSERVICE = 'MICROSERVICE',
+    LIBRARY = 'LIBRARY' 
 }

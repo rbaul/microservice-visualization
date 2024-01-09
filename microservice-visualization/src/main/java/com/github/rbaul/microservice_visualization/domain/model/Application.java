@@ -34,6 +34,9 @@ public class Application {
 	private String location;
 	
 	private String owner;
+
+	@Enumerated(EnumType.STRING)
+	private ApplicationType type;
 	
 	@ElementCollection(fetch = FetchType.EAGER)
 	private Map<String, String> tags;

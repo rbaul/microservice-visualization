@@ -48,6 +48,10 @@ public class Project {
 	@ToString.Exclude
 	@ElementCollection
 	private Map<String, List<String>> connections;
+
+	@ToString.Exclude
+	@ElementCollection
+	private Map<String, List<String>> dependencies;
 	
 	@ToString.Exclude
 	@ElementCollection
