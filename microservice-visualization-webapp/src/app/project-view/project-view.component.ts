@@ -67,7 +67,7 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   toggleOptions: ToggleView[] = [
     { name: 'Table view', value: 1 },
     { name: 'Microservices view', value: 2 },
-    { name: 'Dependecies view', value: 3 }
+    { name: 'Dependencies view', value: 3 }
   ];
   toggleValue: number = 1;
 
