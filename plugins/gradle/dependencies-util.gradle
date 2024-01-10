@@ -48,7 +48,9 @@ def getApplicationJson() {
 
     Map<String, Object> app = [
             name: project.getName(),
-            label: getApplicationExtProperty('name', stringToLabel(project.getName()))
+            label: getApplicationExtProperty('name', stringToLabel(project.getName())),
+            group: project.getGroup(),
+            version: project.getVersion()
     ]
 
     // Description
@@ -61,6 +63,12 @@ def getApplicationJson() {
     String owner = getApplicationExtProperty('ownerName', null)
     if (owner != null) {
         app.put('owner', owner)
+    }
+
+    // Location
+    String location // Add implementation
+    if (location != null) {
+        app.put('location', location)
     }
 
     app.put('tags', [
@@ -82,7 +90,7 @@ tasks.register('createDependencyFile') {
     doLast {
         String dependencyFileLocation = getApplicationExtProperty('dependencyFileLocation', '')
         Map<String, Object> dependencyJson = getApplicationJson()
-        File file = new File("${project.rootDir}/${dependencyFileLocation}" + dependencyJson.name + '.json')
+        File file = new File("${project.rootDir}/${dependencyFileLocation}${dependencyJson.name}.json")
         file.write(JsonOutput.prettyPrint(JsonOutput.toJson(dependencyJson)))
     }
 }
