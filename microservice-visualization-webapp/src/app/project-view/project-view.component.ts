@@ -19,6 +19,7 @@ import { ProjectTopologyComponent, TopologyType } from '../project-topology/proj
 
 import { get } from 'lodash';
 import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-project-view',
@@ -35,7 +36,8 @@ import { DropdownModule } from 'primeng/dropdown';
     InputTextModule,
     ButtonModule,
     TagModule,
-    DropdownModule
+    DropdownModule,
+    MultiSelectModule
   ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.scss'],
@@ -56,11 +58,12 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   };
 
   types: AppType[] = [
-    {label: 'Library', value: ApplicationType.LIBRARY},
-    {label: 'Microservice', value: ApplicationType.MICROSERVICE}  
+    { label: 'Library', value: ApplicationType.LIBRARY },
+    { label: 'Microservice', value: ApplicationType.MICROSERVICE }
   ];
 
-  tags: string[] = ['java', 'Spring Boot', 'Spring Cloud', 'gradle'];
+  selectedTags: string[] = ['java', 'Spring Boot', 'Spring Cloud', 'gradle'];
+  tagOptions: string[] = []
 
   globalFilterFields: string[] = [];
 
@@ -86,6 +89,7 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
       if (projectId) {
         this.projectApi.get(projectId).subscribe(result => {
           this.data = result;
+          this.tagOptions = this.data.tags || [];
         });
       }
     });

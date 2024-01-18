@@ -19,6 +19,7 @@ export interface ProjectDto {
     applications: ApplicationLiteDto[],
     groups?: ApplicationGroupDto[],
     owners?: OwnerDto[],
+    tags?: string[],
     // connections?: Map<String, String[]>,
     connections?: any,
     dependencies?: any,

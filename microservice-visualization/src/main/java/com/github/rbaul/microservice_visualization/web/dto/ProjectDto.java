@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,6 +29,8 @@ public class ProjectDto {
 	private List<ApplicationGroupDto> groups;
 	
 	private List<OwnerDto> owners;
+
+	private Set<String> tags;
 	
 	private ProjectVersionLiteDto projectVersion;
 }

@@ -125,6 +125,14 @@ public abstract class ProjectLoaderService {
         return appConnections;
     }
 
+    protected Set<String> createProjectRelevantTags(Project project) {
+        Set<String> tags = new HashSet<>();
+
+        project.getApplications().forEach(application -> tags.addAll(application.getTags().keySet()));
+
+        return tags;
+    }
+
     protected Application convertApplicationDependencyToApplication(ApplicationDependency applicationDependency, ApplicationType type) {
         Application application = new Application();
         application.setName(applicationDependency.name());
@@ -196,6 +204,8 @@ public abstract class ProjectLoaderService {
         project.setConnections(createTopology(project, projectConfig.getApplicationPostfix(), projectConfig.getApplicationApiPostfixes()));
         // Dependencies
         project.setDependencies(createDependenciesMap(project));
+        // Relevant Tags
+        project.setTags(createProjectRelevantTags(project));
         if (!CollectionUtils.isEmpty(projectConfig.getGroups())) {
             List<ApplicationGroup> groups = getGroups(projectConfig.getGroups());
             List<ApplicationGroup> filteredGroups = groups.stream()

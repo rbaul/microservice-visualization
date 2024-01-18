@@ -60,6 +60,10 @@ public class Project {
 	@ToString.Exclude
 	@ElementCollection
 	private List<Owner> owners;
+
+	@ToString.Exclude
+	@ElementCollection
+	private Set<String> tags;
 	
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)
