@@ -1,6 +1,6 @@
 plugins {
   id 'java'
-  id 'com.github.node-gradle.node' version '3.5.1'
+  id 'com.github.node-gradle.node' version '7.0.1'
 }
 
 node {
@@ -11,7 +11,7 @@ node {
 
 tasks.register('bundle', NpmTask) {
   dependsOn npmInstall
-  args = ['run', 'build', '--production']
+  args = ['run', 'build', '--omit=dev']
 }
 
 tasks.register('run', NpmTask) {
