@@ -27,8 +27,9 @@
         <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
           placeholder="Search keyword" />
       </span>
-      <p-multiSelect class="to-end" [options]="tagOptions" [(ngModel)]="selectedTags" selectedItemsLabel="{0} columns selected"
-        [style]="{'min-width': '250px'}" placeholder="Choose Columns"></p-multiSelect>
+      <p-multiSelect class="to-end" [options]="tagOptions" [(ngModel)]="selectedTags"
+        selectedItemsLabel="{0} columns selected" [style]="{'min-width': '250px'}"
+        placeholder="Choose Columns"></p-multiSelect>
     </div>
 
   </ng-template>
@@ -57,6 +58,11 @@
         Type
         <p-sortIcon field="type"></p-sortIcon>
       </th>
+      <th pSortableColumn="owner">
+        <p-columnFilter type="text" field="owner" display="menu"></p-columnFilter>
+        Owner
+        <p-sortIcon field="owner"></p-sortIcon>
+      </th>
       @for (tag of selectedTags; track $index) {
       <th pSortableColumn="tags.{{tag}}">
         <p-columnFilter type="text" field="tags.{{tag}}" display="menu"></p-columnFilter>
@@ -78,6 +84,9 @@
         } @else {
         <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
         }
+      </td>
+      <td>
+        {{ app.owner }}
       </td>
       @for (tag of selectedTags; track $index) {
       <td>

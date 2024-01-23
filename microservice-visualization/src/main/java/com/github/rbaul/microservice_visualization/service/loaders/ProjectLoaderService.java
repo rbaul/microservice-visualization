@@ -214,12 +214,33 @@ public abstract class ProjectLoaderService {
                                     .anyMatch(application -> application.getName().equals(appName)))).collect(Collectors.toList());
             project.setGroups(filteredGroups);
         }
-        if (!CollectionUtils.isEmpty(projectConfig.getOwners())) {
+        if (!CollectionUtils.isEmpty(projectConfig.getOwners())) { // From Config
             List<Owner> owners = getOwners(projectConfig.getOwners());
             List<Owner> filteredOwners = owners.stream()
                     .filter(owner -> owner.getApplicationNames().stream()
                             .anyMatch(appName -> applicationDependencies.stream()
                                     .anyMatch(application -> application.getName().equals(appName)))).collect(Collectors.toList());
+            project.setOwners(filteredOwners);
+        } else { // From Application
+            Map<String, List<String>> owners = new HashMap<>();
+            applicationDependencies.forEach(application -> {
+                if (StringUtils.hasText(application.getOwner())) {
+                    String[] multiOwners = application.getOwner().split(",");
+                    for (String owner : multiOwners) {
+                        String ow = owner.trim();
+                        if (StringUtils.hasText(ow)) {
+                            if (!owners.containsKey(ow)) {
+                                owners.put(ow, new ArrayList<>());
+                            }
+                            owners.get(ow).add(application.getName());
+                        }
+                    }
+                }
+            });
+
+            List<Owner> filteredOwners = owners.entrySet().stream()
+                    .map(entry -> Owner.builder()
+                            .name(entry.getKey()).applicationNames(entry.getValue()).build()).toList();
             project.setOwners(filteredOwners);
         }
         project.setVersionId(versionId);
