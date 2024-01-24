@@ -225,7 +225,7 @@ public abstract class ProjectLoaderService {
             Map<String, List<String>> owners = new HashMap<>();
             applicationDependencies.forEach(application -> {
                 if (StringUtils.hasText(application.getOwner())) {
-                    String[] multiOwners = application.getOwner().split(",");
+                    String[] multiOwners = application.getOwner().split(";");
                     for (String owner : multiOwners) {
                         String ow = owner.trim();
                         if (StringUtils.hasText(ow)) {
