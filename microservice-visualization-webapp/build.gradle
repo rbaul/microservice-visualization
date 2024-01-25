@@ -26,7 +26,8 @@ tasks.register('uiTest', NpmTask) {
   args = ['run', 'test']
 }
 
-tasks.register('webjar', Jar) {
+// Add ui files to jar
+jar {
   from(fileTree('dist/microservice-visualization-webapp')) {
     into 'META-INF/resources'
   }
@@ -34,4 +35,3 @@ tasks.register('webjar', Jar) {
 
 check.dependsOn(test)
 jar.dependsOn('bundle')
-jar.finalizedBy('webjar')
