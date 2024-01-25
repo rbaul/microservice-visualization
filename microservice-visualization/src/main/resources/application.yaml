@@ -26,6 +26,10 @@ spring:
     ansi:
       enabled: always
 
+  threads:
+    virtual:
+      enabled: true
+
 logging:
   level:
     ROOT: info
