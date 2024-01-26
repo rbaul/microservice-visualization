@@ -17,9 +17,9 @@ All Spring Boot (Java) applications has dependencies to other applications, that
 > * Maven (TODO)
 
 ## Build on
-* Java 17, Framework Spring Boot 3.2.x
+* Java 21, Framework Spring Boot 3.2.x
 * Angular 17.0.x, PrimeNG
-* Gradle 7.6.1
+* Gradle 8.5.0
 
 #### Microservice architecture demo
 > * Example of microservice project [Demo Project](demo)  
