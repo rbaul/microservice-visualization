@@ -17,7 +17,8 @@
   [paginator]="true" [rows]="10" [showCurrentPageReport]="true" (sortFunction)="customSort($event)" [customSort]="true"
   currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [rowsPerPageOptions]="[10, 25, 50]"
   [scrollable]="true" scrollHeight="calc(80vh - 200px)" [styleClass]="'p-datatable-sm'"
-  [globalFilterFields]="globalFilterFields">
+  [globalFilterFields]="globalFilterFields" [resizableColumns]="true"
+  [reorderableColumns]="true" [columns]="selectedColumns">
 
   <ng-template pTemplate="caption">
     <div class="flex">
@@ -27,21 +28,21 @@
         <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
           placeholder="Search keyword" />
       </span>
-      <p-multiSelect class="to-end" [options]="tagOptions" [(ngModel)]="selectedTags"
+      <p-multiSelect class="to-end" [options]="columnOptions" [(ngModel)]="selectedColumns"
         selectedItemsLabel="{0} columns selected" [style]="{'min-width': '250px'}"
-        placeholder="Choose Columns"></p-multiSelect>
+        placeholder="Choose Columns" optionLabel="name"></p-multiSelect>
     </div>
 
   </ng-template>
 
   <ng-template pTemplate="header" let-app>
     <tr>
-      <th pSortableColumn="name">
+      <th pSortableColumn="name" pResizableColumn [style]="{ 'width': '50px' }">
         <p-columnFilter type="text" field="name" display="menu"></p-columnFilter>
         Name
         <p-sortIcon field="name"></p-sortIcon>
       </th>
-      <th pSortableColumn="type">
+      <th pSortableColumn="type" [style]="{ 'width': '50px' }">
         <p-columnFilter field="type" matchMode="equals" display="menu">
           <ng-template pTemplate="filter" let-value let-filter="filterCallback">
             <p-dropdown [ngModel]="value" [options]="types" (onChange)="filter($event.value)" placeholder="Any">
@@ -58,19 +59,14 @@
         Type
         <p-sortIcon field="type"></p-sortIcon>
       </th>
-      <th pSortableColumn="owner">
-        <p-columnFilter type="text" field="owner" display="menu"></p-columnFilter>
-        Owner
-        <p-sortIcon field="owner"></p-sortIcon>
-      </th>
-      @for (tag of selectedTags; track $index) {
-      <th pSortableColumn="tags.{{tag}}">
-        <p-columnFilter type="text" field="tags.{{tag}}" display="menu"></p-columnFilter>
-        {{tag}}
-        <p-sortIcon field="tags.{{tag}}"></p-sortIcon>
+      @for (column of selectedColumns; track $index) {
+      <th pSortableColumn="{{column.path}}" [style]="{ 'width': '50px' }" pReorderableColumn pResizableColumn>
+        <p-columnFilter type="text" field="{{column.path}}" display="menu"></p-columnFilter>
+        {{column.name}}
+        <p-sortIcon field="{{column.path}}"></p-sortIcon>
       </th>
       }
-      <th style="width: 5rem"></th>
+      <th style="width: 5rem">Action</th>
     </tr>
   </ng-template>
   <ng-template pTemplate="body" let-app>
@@ -85,12 +81,10 @@
         <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
         }
       </td>
-      <td>
-        {{ app.owner }}
-      </td>
-      @for (tag of selectedTags; track $index) {
-      <td>
-        {{app.tags[tag]}}
+      @for (column of selectedColumns; track $index) {
+      <td [style]="{ 'text-wrap': 'wrap' }">
+        {{getData(app, column)}}
+        <!-- {{app.tags[tag]}} -->
       </td>
       }
       <td>

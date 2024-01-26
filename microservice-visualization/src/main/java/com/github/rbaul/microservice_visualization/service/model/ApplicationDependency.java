@@ -10,6 +10,8 @@ public record ApplicationDependency(
         String name,
         String label,
         String description,
+        String group,
+        String version,
         String location,
         String owner,
         Map<String, String> tags,

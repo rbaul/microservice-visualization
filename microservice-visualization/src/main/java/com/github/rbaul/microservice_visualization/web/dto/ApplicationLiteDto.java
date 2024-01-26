@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,9 +29,13 @@ public class ApplicationLiteDto {
 
 	private ApplicationType type;
 
+	private String group;
+
+	private String version;
+
 	private String location;
 	
-	private String owner;
+	private Set<String> owners;
 	
 	private Map<String, String> tags;
 }

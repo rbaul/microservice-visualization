@@ -17,7 +17,7 @@ export interface ApplicationLiteDto {
     description: string,
     type: ApplicationType,
     location: string,
-    owner: string,
+    owners: string[],
     tags: any
 }
 
