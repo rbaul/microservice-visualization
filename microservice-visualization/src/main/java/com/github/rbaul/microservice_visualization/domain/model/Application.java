@@ -11,6 +11,7 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,9 +32,15 @@ public class Application {
 	
 	private String description;
 
+	@Column(name = "artifact_group")
+	private String group;
+
+	private String version;
+
 	private String location;
-	
-	private String owner;
+
+	@ElementCollection
+	private Set<String> owners;
 
 	@Enumerated(EnumType.STRING)
 	private ApplicationType type;

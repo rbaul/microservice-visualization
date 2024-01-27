@@ -62,8 +62,16 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
     { label: 'Microservice', value: ApplicationType.MICROSERVICE }
   ];
 
-  selectedTags: string[] = ['java', 'Spring Boot', 'Spring Cloud', 'gradle'];
-  tagOptions: string[] = []
+  selectedColumns: ColumnData[] = [
+    { name: 'Owner', path: 'owners' },
+    // { name: 'Description', path: 'description' },
+    { name: 'java', path: 'tags.java' },
+    { name: 'Spring Boot', path: 'tags.Spring Boot' },
+    { name: 'Spring Cloud', path: 'tags.Spring Cloud' },
+    { name: 'gradle', path: 'tags.gradle' }
+  ];
+
+  columnOptions: ColumnData[] = []
 
   globalFilterFields: string[] = [];
 
@@ -89,7 +97,16 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
       if (projectId) {
         this.projectApi.get(projectId).subscribe(result => {
           this.data = result;
-          this.tagOptions = this.data.tags || [];
+          this.columnOptions = this.data.tags?.map(tag => {
+            return { name: tag, path: `tags.${tag}` } as ColumnData
+          }) || [];
+
+          this.columnOptions.push(
+            { name: 'Description', path: 'description' },
+            { name: 'Owner', path: 'owners' },
+            { name: 'Version', path: 'version' },
+            { name: 'Group', path: 'group' }
+          );
         });
       }
     });
@@ -112,6 +129,10 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
         applicationId: application.id
       }
     });
+  }
+
+  getData(application: ApplicationLiteDto, column: ColumnData): string {
+    return get(application, column.path);
   }
 
   onRowSelect($event: any) {
@@ -158,4 +179,9 @@ interface ToggleView {
 interface AppType {
   value: ApplicationType,
   label: string
+}
+
+interface ColumnData {
+  name: string,
+  path: string
 }

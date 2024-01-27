@@ -140,8 +140,18 @@ public abstract class ProjectLoaderService {
                 applicationDependency.description() : String.format("%s application", applicationDependency.name());
         application.setDescription(description);
         application.setLocation(applicationDependency.location());
-        application.setOwner(applicationDependency.owner());
+        // Owner
+        String owner = applicationDependency.owner();
+        if (StringUtils.hasText(owner)) {
+            application.setOwners(Arrays.stream(owner.split(";"))
+                    .map(String::trim)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toSet()));
+        }
+
         application.setLabel(applicationDependency.label());
+        application.setGroup(applicationDependency.group());
+        application.setVersion(applicationDependency.version());
         application.setDependencies(applicationDependency.dependencies());
         application.setManagementDependencies(applicationDependency.managementDependencies());
         Map<String, String> tags = new HashMap<>(applicationDependency.tags());
@@ -224,16 +234,13 @@ public abstract class ProjectLoaderService {
         } else { // From Application
             Map<String, List<String>> owners = new HashMap<>();
             applicationDependencies.forEach(application -> {
-                if (StringUtils.hasText(application.getOwner())) {
-                    String[] multiOwners = application.getOwner().split(";");
-                    for (String owner : multiOwners) {
-                        String ow = owner.trim();
-                        if (StringUtils.hasText(ow)) {
-                            if (!owners.containsKey(ow)) {
-                                owners.put(ow, new ArrayList<>());
-                            }
-                            owners.get(ow).add(application.getName());
+                Set<String> multiOwner = application.getOwners();
+                if (!CollectionUtils.isEmpty(multiOwner)) {
+                    for (String owner : multiOwner) {
+                        if (!owners.containsKey(owner)) {
+                            owners.put(owner, new ArrayList<>());
                         }
+                        owners.get(owner).add(application.getName());
                     }
                 }
             });
