@@ -29,7 +29,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.flywaydb:flyway-core'
 
-
     // OpenApi
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.+'
 
@@ -38,6 +37,12 @@ dependencies {
 
 	// GitHub
 	implementation 'org.kohsuke:github-api:1.318'
+
+	// JGraphT
+	implementation 'org.jgrapht:jgrapht-core:1.5.2'
+
+	// Hibernate types
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.1'
 
 
 	// WebApp

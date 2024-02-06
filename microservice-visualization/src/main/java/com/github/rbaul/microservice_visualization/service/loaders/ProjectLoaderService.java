@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.*;
+import com.github.rbaul.microservice_visualization.service.AlgorithmUtils;
 import com.github.rbaul.microservice_visualization.service.model.ApplicationDependency;
 import com.github.rbaul.microservice_visualization.service.model.ProjectConfig;
 import com.github.rbaul.microservice_visualization.utils.ConverterUtils;
@@ -125,6 +126,28 @@ public abstract class ProjectLoaderService {
         return appConnections;
     }
 
+    protected Map<String, List<String>> createLibDependenciesMap(Project project) {
+        Map<String, List<String>> appConnections = new HashMap<>();
+        Set<String> appNames = project.getApplications().stream()
+                .filter(application -> application.getType() == ApplicationType.LIBRARY).map(Application::getName).collect(Collectors.toSet());
+
+        project.getApplications().forEach(application -> {
+            if (application.getType() == ApplicationType.LIBRARY) {
+                appConnections.put(application.getName(), new ArrayList<>());
+                if (application.getDependencies() != null) {
+                    application.getDependencies().forEach(dep -> {
+                        Dependency dependency = ConverterUtils.convertDependency(dep);
+                        if (!application.getName().equals(dependency.name()) && appNames.contains(dependency.name())) {
+                            appConnections.get(application.getName()).add(dependency.name());
+                        }
+                    });
+                }
+            }
+        });
+
+        return appConnections;
+    }
+
     protected Set<String> createProjectRelevantTags(Project project) {
         Set<String> tags = new HashSet<>();
 
@@ -214,6 +237,10 @@ public abstract class ProjectLoaderService {
         project.setConnections(createTopology(project, projectConfig.getApplicationPostfix(), projectConfig.getApplicationApiPostfixes()));
         // Dependencies
         project.setDependencies(createDependenciesMap(project));
+
+        // Cycle dependencies
+        project.setLibrariesCycle(AlgorithmUtils.findSimpleCycles(createLibDependenciesMap(project)));
+
         // Relevant Tags
         project.setTags(createProjectRelevantTags(project));
         if (!CollectionUtils.isEmpty(projectConfig.getGroups())) {
