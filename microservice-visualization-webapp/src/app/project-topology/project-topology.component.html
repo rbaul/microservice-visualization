@@ -14,14 +14,22 @@
 <div #visNetworkContainer class="vis-network-canvas"></div>
 <p-toolbar class="network-toolbar" styleClass="vertical-align">
   <div class="p-toolbar-group-start">
-    <p-button icon="pi pi-arrows-alt" class="mr-2" (click)="fit()" tooltipPosition="top" pTooltip="Fit to screen"></p-button>
-    <p-button icon="pi pi-search-plus" class="mr-2" (click)="zoomIn()" tooltipPosition="top" pTooltip="Zoom in"></p-button>
-    <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()" tooltipPosition="top" pTooltip="Zoom out"></p-button>
-    <p-button icon="pi pi-window-maximize" class="mr-2" (click)="collapseAll()" tooltipPosition="top" pTooltip="Collapse all"></p-button>
-    <p-button icon="pi pi-window-minimize" class="mr-2" (click)="uncollapseAll()" tooltipPosition="top" pTooltip="Uncollapse all"></p-button>
-    <p-button icon="pi pi-share-alt" [disabled]="isNodeSelected()" class="mr-2" (click)="showDependenciesBySelectedNode()" tooltipPosition="top" pTooltip="Show dependencies"></p-button>
-    <p-button icon="pi pi-link" [disabled]="isNodeSelected()" class="mr-2" (click)="showNeighborsBySelectedNode()" tooltipPosition="top" pTooltip="Show neighbors"></p-button>
-    <p-button icon="pi pi-filter-slash" [disabled]="isFilterApplied()" class="mr-2" (click)="clearAppFilter()" tooltipPosition="top" pTooltip="Clear filters"></p-button>
+    <p-button icon="pi pi-arrows-alt" class="mr-2" (click)="fit()" tooltipPosition="top"
+      pTooltip="Fit to screen"></p-button>
+    <p-button icon="pi pi-search-plus" class="mr-2" (click)="zoomIn()" tooltipPosition="top"
+      pTooltip="Zoom in"></p-button>
+    <p-button icon="pi pi-search-minus" class="mr-2" (click)="zoomOut()" tooltipPosition="top"
+      pTooltip="Zoom out"></p-button>
+    <p-button icon="pi pi-window-maximize" class="mr-2" (click)="collapseAll()" tooltipPosition="top"
+      pTooltip="Collapse all"></p-button>
+    <p-button icon="pi pi-window-minimize" class="mr-2" (click)="uncollapseAll()" tooltipPosition="top"
+      pTooltip="Uncollapse all"></p-button>
+    <p-button icon="pi pi-share-alt" [disabled]="isNodeSelected()" class="mr-2"
+      (click)="showDependenciesBySelectedNode()" tooltipPosition="top" pTooltip="Show dependencies"></p-button>
+    <p-button icon="pi pi-link" [disabled]="isNodeSelected()" class="mr-2" (click)="showNeighborsBySelectedNode()"
+      tooltipPosition="top" pTooltip="Show neighbors"></p-button>
+    <p-button icon="pi pi-filter-slash" [disabled]="isFilterApplied()" class="mr-2" (click)="clearAppFilter()"
+      tooltipPosition="top" pTooltip="Clear filters"></p-button>
 
 
     <p-multiSelect [options]="apps" [(ngModel)]="selectedApps" optionLabel="name" [showClear]="true"
@@ -38,10 +46,14 @@
       (onChange)="onFilterOwners($event.value)">
     </p-multiSelect>
 
-    <p-multiSelect [options]="typeOptions" [(ngModel)]="selectedTypes" [showClear]="true"
-      (onClear)="clearAppFilter()" placeholder="Select relevant types" display="chip"
-      (onChange)="onFilterTypes($event.value)">
+    <p-multiSelect [options]="typeOptions" [(ngModel)]="selectedTypes" [showClear]="true" (onClear)="clearAppFilter()"
+      placeholder="Select relevant types" display="chip" (onChange)="onFilterTypes($event.value)">
     </p-multiSelect>
+
+
+    <p-dropdown [style]="{'width': '300px'}" [options]="cycleIssues" [(ngModel)]="selectedCycleIssue" [showClear]="true"
+      placeholder="Select a cycle issue" (onChange)="onCycleIssueSelect($event.value)"></p-dropdown>
+
   </div>
 </p-toolbar>
 

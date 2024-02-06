@@ -25,6 +25,8 @@ public class ProjectDto {
 	private Map<String, List<String>> connections;
 
 	private Map<String, List<String>> dependencies;
+
+	private Set<List<String>> librariesCycle;
 	
 	private List<ApplicationGroupDto> groups;
 	

@@ -11,6 +11,7 @@ import { DataSet, IdType, Network } from 'vis-network/standalone';
 import { ApplicationLiteDto, ApplicationType } from '../api/application-api.model';
 import { COLLAPSED_NAME, GROUP_MARGIN, MOVE_TO_SCALE, NODE_HEIGHT, NODE_WIDTH, SCALE_FACTORY, topologyOptions } from './project-topology.const';
 
+
 interface GroupCluster {
   id?: string,
   name?: string,
@@ -47,6 +48,7 @@ export enum TopologyType {
     DropdownModule,
     FormsModule,
     ButtonModule,
+    DropdownModule
     // ContextMenuModule
   ],
   templateUrl: './project-topology.component.html',
@@ -86,6 +88,8 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
   selectedApp?: ApplicationLiteDto;
 
   selectedNodes: string[] = [];
+  cycleIssues?: [string[]];
+  selectedCycleIssue?: string[];
 
   // items: MenuItem[] = [];
 
@@ -334,6 +338,8 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
     this.moveToAppOptions = this.data.applications;
 
+    this.cycleIssues = this.data.librariesCycle;
+
     const edges: any[] = [];
 
     if (this.type === TopologyType.ALL || this.type === TopologyType.MICROSERVICES) {
@@ -501,6 +507,11 @@ export class ProjectTopologyComponent implements OnInit, AfterViewInit, OnChange
 
   onFilterTypes(types: ApplicationType[]): void {
     const applictionsToShow = this.apps.filter((app) => types.includes(app.type));
+    this.onFilterApps(applictionsToShow);
+  }
+
+  onCycleIssueSelect(cycleIssue: string[]): void {
+    const applictionsToShow = this.apps.filter((app) => cycleIssue.includes(app.name));
     this.onFilterApps(applictionsToShow);
   }
 

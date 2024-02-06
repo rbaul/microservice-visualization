@@ -23,6 +23,7 @@ export interface ProjectDto {
     // connections?: Map<String, String[]>,
     connections?: any,
     dependencies?: any,
+    librariesCycle?: [string[]],
     projectVersion: ProjectVersionLiteDto
 }
 
