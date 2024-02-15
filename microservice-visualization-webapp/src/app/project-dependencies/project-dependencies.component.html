@@ -1,0 +1,67 @@
+<p-toolbar>
+    <div class="p-toolbar-group-start">
+        Dependencies of {{data.projectVersion.name}}
+    </div>
+    <p-tag value="{{data.version}}" severity="success"></p-tag>
+    <div class="p-toolbar-group-end">
+        <button label="Open Project" pButton pRipple icon="pi pi-external-link" class="p-button-text"
+            (click)="openProject()"></button>
+    </div>
+</p-toolbar>
+<p-table #dt1 [value]="data.dependencies" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true" [rows]="25"
+    [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+    [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="calc(80vh - 200px)" (sortFunction)="customSort($event)" [customSort]="true"
+    [styleClass]="'p-datatable-sm'" [resizableColumns]="true" [reorderableColumns]="true"
+    [globalFilterFields]="globalFilterFields">
+
+    <ng-template pTemplate="caption">
+        <div class="flex">
+            <button pButton label="Clear" class="p-button-outlined" icon="pi pi-filter-slash"
+                (click)="clear(dt1)"></button>
+            <span class="p-input-icon-left ml-auto">
+                <i class="pi pi-search"></i>
+                <input #filterInput pInputText type="text" (input)="dt1.filterGlobal(filterInput.value, 'contains')"
+                    placeholder="Search keyword" />
+            </span>
+        </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+        <tr>
+            <th pSortableColumn="packageName" pResizableColumn [style]="{ 'width': '50px' }">
+                <p-columnFilter type="text" field="packageName" display="menu"></p-columnFilter>
+                Package Name
+                <p-sortIcon field="packageName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="artifactName" pResizableColumn [style]="{ 'width': '50px' }">
+                <p-columnFilter type="text" field="artifactName" display="menu"></p-columnFilter>
+                Artifact Name
+                <p-sortIcon field="artifactName"></p-sortIcon>
+            </th>
+            <th pSortableColumn="version" pResizableColumn [style]="{ 'width': '50px' }">
+                <p-columnFilter type="text" field="version" display="menu"></p-columnFilter>
+                Version
+                <p-sortIcon field="version"></p-sortIcon>
+            </th>
+            <th>Usage</th>
+            <!-- <th style="width: 5rem"></th> -->
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-dependency>
+        <tr>
+            <td>{{ dependency.packageName }}</td>
+            <td>{{ dependency.artifactName }}</td>
+            <td>{{ dependency.version }}</td>
+            <td [style]="{ 'text-wrap': 'wrap' }">{{ dependency.usageOf }}</td>
+            <!-- <td style="display: flex">
+        <button label="Open" pButton pRipple icon="pi pi-external-link" class="p-button-text" (click)="openVersion(project)"></button>
+        <button label="Dependencies" pButton pRipple icon="pi pi-window-maximize" class="p-button-text" (click)="showProjectDependencies(project)"></button>
+      </td> -->
+        </tr>
+    </ng-template>
+    <ng-template pTemplate="summary">
+        <div class="flex align-items-center justify-content-between">
+            In total there are {{data.dependencies ? data.dependencies.length : 0 }} dependencies.
+        </div>
+    </ng-template>
+</p-table>

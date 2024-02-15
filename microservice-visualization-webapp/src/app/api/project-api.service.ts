@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { httpJsonOptions } from '../utils/api-utils';
 import { Page } from './../utils/page';
-import { ProjectDto, ProjectLiteDto } from './project-api.model';
+import { ProjectDependenciesDto, ProjectDto, ProjectLiteDto } from './project-api.model';
 
 const API_URL = '/api/v1/projects';
 
@@ -25,6 +25,10 @@ export class ProjectApiService {
   public getPageable(projectVersionId: number): Observable<Page<ProjectLiteDto>> {
     return this.http.get<Page<ProjectLiteDto>>(`${API_URL}/search`,
       { params: new HttpParams().set('projectVersionId', projectVersionId) });
+  }
+
+  public getDependencies(id: number): Observable<ProjectDependenciesDto> {
+    return this.http.get<ProjectDependenciesDto>(`${API_URL}/${id}/dependencies`, httpJsonOptions);
   }
 
 }

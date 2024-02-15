@@ -1,6 +1,6 @@
 <p-toolbar>
   <div class="p-toolbar-group-start">
-    Project: {{data.name}} - {{data.description}}
+    Versions of {{data.name}} - {{data.description}}
   </div>
 </p-toolbar>
 
@@ -32,8 +32,9 @@
           <p-tag value="main" severity="danger"></p-tag>
         }
       </td>
-      <td>
-        <button type="button" pButton pRipple icon="pi pi-external-link" (click)="openVersion(project)"></button>
+      <td style="display: flex">
+        <button label="Open" pButton pRipple icon="pi pi-external-link" class="p-button-text" (click)="openVersion(project)"></button>
+        <button label="Dependencies" pButton pRipple icon="pi pi-window-maximize" class="p-button-text" (click)="showProjectDependencies(project)"></button>
       </td>
     </tr>
   </ng-template>

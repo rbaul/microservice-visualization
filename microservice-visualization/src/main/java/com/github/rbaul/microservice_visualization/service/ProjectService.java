@@ -1,5 +1,6 @@
 package com.github.rbaul.microservice_visualization.service;
 
+import com.github.rbaul.microservice_visualization.domain.model.Application;
 import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.domain.model.ProjectVersion;
@@ -7,9 +8,9 @@ import com.github.rbaul.microservice_visualization.domain.repository.ProjectRepo
 import com.github.rbaul.microservice_visualization.domain.repository.ProjectVersionRepository;
 import com.github.rbaul.microservice_visualization.exception.MicroserviceVisualizationException;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderFactory;
-import com.github.rbaul.microservice_visualization.service.loaders.ProjectNotificationType;
-import com.github.rbaul.microservice_visualization.web.dto.ProjectDto;
-import com.github.rbaul.microservice_visualization.web.dto.ProjectLiteDto;
+import com.github.rbaul.microservice_visualization.utils.ConverterUtils;
+import com.github.rbaul.microservice_visualization.utils.Dependency;
+import com.github.rbaul.microservice_visualization.web.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -105,4 +106,32 @@ public class ProjectService {
     }
 
 
+    @Transactional(readOnly = true)
+    public ProjectDependenciesDto getDependencies(int id) {
+        Project project = getById(id);
+
+        Map<String, DependencyDto> dependencies = new HashMap<>();
+        Set<Application> applications = project.getApplications();
+        for (Application application : applications) {
+            for (String dependencyString : application.getDependencies()) {
+                Dependency dependency = ConverterUtils.convertDependency(dependencyString);
+
+                if (!dependencies.containsKey(dependencyString)) {
+                    dependencies.put(dependencyString, DependencyDto.builder()
+                            .packageName(dependency.packageId())
+                            .artifactName(dependency.name())
+                            .version(dependency.version()).build());
+                }
+                dependencies.get(dependencyString).getUsageOf().add(application.getName());
+            }
+        }
+
+        ProjectVersion projectVersion = project.getProjectVersion();
+        ProjectVersionLiteDto projectVersionLiteDto = modelMapper.map(projectVersion, ProjectVersionLiteDto.class);
+        return ProjectDependenciesDto.builder()
+                .id(project.getId())
+                .version(project.getVersion())
+                .dependencies(new HashSet<>(dependencies.values()))
+                .projectVersion(projectVersionLiteDto).build();
+    }
 }

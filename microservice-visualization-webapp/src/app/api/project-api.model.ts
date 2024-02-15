@@ -31,3 +31,15 @@ export interface ProjectLiteDto {
     id: number,
     version: string
 }
+
+export interface DependencyDto {
+    packageName: string,
+    artifactName: string,
+    version: string,
+    usageOf: string[]
+}
+
+export interface ProjectDependenciesDto extends ProjectLiteDto {
+    dependencies: DependencyDto[],
+    projectVersion: ProjectVersionLiteDto
+}

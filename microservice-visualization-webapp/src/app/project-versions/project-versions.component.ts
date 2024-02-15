@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -56,6 +56,10 @@ export class ProjectVersionsComponent implements OnInit {
 
   openVersion(project: ProjectLiteDto) {
     this.router.navigate([`projects/${project.id}`]);
+  }
+
+  showProjectDependencies(project: ProjectLiteDto) {
+    this.router.navigate([`projects/${project.id}/dependencies`]);
   }
 
 }
