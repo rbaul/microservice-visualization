@@ -19,7 +19,7 @@ import { ToolbarModule } from 'primeng/toolbar';
 export class AppComponent {
   router = inject(Router);
 
-  title = 'Microservice Visualization by Dependencies';
+  title = 'Version Control Management';
 
   navigateHome() {
     this.router.navigate(['projects']);

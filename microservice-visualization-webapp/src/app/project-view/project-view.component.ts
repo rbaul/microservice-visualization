@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -20,6 +20,7 @@ import { ProjectTopologyComponent, TopologyType } from '../project-topology/proj
 import { get } from 'lodash';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ProjectDependenciesComponent } from '../project-dependencies/project-dependencies.component';
 
 @Component({
   selector: 'app-project-view',
@@ -48,6 +49,7 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
   private activatedRoute = inject(ActivatedRoute);
   public dialogService = inject(DialogService);
   private projectApi = inject(ProjectApiService);
+  private router = inject(Router);
 
   public TopologyTypeEnum = TopologyType;
 
@@ -129,6 +131,10 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
         applicationId: application.id
       }
     });
+  }
+
+  showProjectDependencies() {
+    this.router.navigate([`projects/${this.data.id}/dependencies`]);
   }
 
   getData(application: ApplicationLiteDto, column: ColumnData): string {

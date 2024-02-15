@@ -14,9 +14,9 @@
       <td>{{ project.description }}</td>
       <td>
         <div style="display: flex">
-          <button type="button" pButton pRipple icon="pi pi-angle-right"
+          <button label="Versions" pButton pRipple icon="pi pi-angle-right" class="p-button-text"
             (click)="selectProjectVersion(project)"></button>
-          <button type="button" pButton pRipple icon="pi pi-external-link"
+          <button label="Main" pButton pRipple icon="pi pi-external-link" class="p-button-text"
             (click)="openDefaultVersion(project)"></button>
         </div>
       </td>

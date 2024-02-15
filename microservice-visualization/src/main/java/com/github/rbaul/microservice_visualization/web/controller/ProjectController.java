@@ -1,6 +1,7 @@
 package com.github.rbaul.microservice_visualization.web.controller;
 
 import com.github.rbaul.microservice_visualization.service.ProjectService;
+import com.github.rbaul.microservice_visualization.web.dto.ProjectDependenciesDto;
 import com.github.rbaul.microservice_visualization.web.dto.ProjectDto;
 import com.github.rbaul.microservice_visualization.web.dto.ProjectLiteDto;
 import lombok.RequiredArgsConstructor;
@@ -44,4 +45,8 @@ public class ProjectController {
         return projectService.search(projectVersionId, pageable);
     }
 
+    @GetMapping("/{id}/dependencies")
+    public ProjectDependenciesDto getDependencies(@PathVariable("id") int id) {
+        return projectService.getDependencies(id);
+    }
 }
