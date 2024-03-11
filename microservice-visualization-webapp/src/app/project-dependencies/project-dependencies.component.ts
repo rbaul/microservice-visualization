@@ -8,6 +8,9 @@ import { ToolbarModule } from 'primeng/toolbar';
 import { ProjectApiService } from '../api/project-api.service';
 import { TagModule } from 'primeng/tag';
 import { ProjectDependenciesDto } from '../api/project-api.model';
+import { SelectButtonChangeEvent, SelectButtonModule } from 'primeng/selectbutton';
+import { ToggleView } from '../project-view/project-view.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-project-dependencies',
@@ -18,7 +21,9 @@ import { ProjectDependenciesDto } from '../api/project-api.model';
     TableModule,
     InputTextModule,
     ButtonModule,
-    TagModule
+    TagModule,
+    SelectButtonModule,
+    FormsModule
   ],
   templateUrl: './project-dependencies.component.html',
   styleUrl: './project-dependencies.component.scss'
@@ -28,17 +33,32 @@ export class ProjectDependenciesComponent {
   private router = inject(Router);
   private projectApiService = inject(ProjectApiService);
 
-  data!: ProjectDependenciesDto;
+  private projectId!: number;
+
+  toggleOptions: ToggleView[] = [
+    { name: 'Direct', value: 1 },
+    { name: 'Full', value: 2 },
+    { name: 'Implicit', value: 3 }
+  ];
+
+  toggleSelect: number = 1;
+
+  data: ProjectDependenciesDto = {
+    id: 0,
+    version: '0',
+    dependencies: [],
+    projectVersion: {
+      name: ''
+    }
+  };
 
   globalFilterFields: string[] = ['packageName', 'artifactName'];
 
   ngOnInit() {
     this.activatedRoute.params.subscribe(value => {
-      let projectId: number = value['id'];
-      if (projectId) {
-        this.projectApiService.getDependencies(projectId).subscribe(result => {
-          this.data = result;
-        });
+      this.projectId = value['id'];
+      if (this.projectId) {
+        this.filterChange(1);
       }
     });
   }
@@ -49,6 +69,32 @@ export class ProjectDependenciesComponent {
 
   clear(table: Table) {
     table.clear();
+  }
+
+  filterChange(value: number): void {
+    switch(value) {
+      case 1: {
+        this.projectApiService.getDirectDependencies(this.projectId).subscribe(result => {
+          this.data = result;
+        });
+        break;
+      }
+      case 2: {
+        this.projectApiService.getDependencies(this.projectId).subscribe(result => {
+          this.data = result;
+        });
+        break;
+      }
+      case 3: {
+        this.projectApiService.getImplicitDependencies(this.projectId).subscribe(result => {
+          this.data = result;
+        });
+        break;
+      }
+      default: {
+        
+      }
+    }
   }
 
   customSort(event: any) {

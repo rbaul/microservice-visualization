@@ -20,7 +20,6 @@ import { ProjectTopologyComponent, TopologyType } from '../project-topology/proj
 import { get } from 'lodash';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
-import { ProjectDependenciesComponent } from '../project-dependencies/project-dependencies.component';
 
 @Component({
   selector: 'app-project-view',
@@ -61,7 +60,8 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
 
   types: AppType[] = [
     { label: 'Library', value: ApplicationType.LIBRARY },
-    { label: 'Microservice', value: ApplicationType.MICROSERVICE }
+    { label: 'Microservice', value: ApplicationType.MICROSERVICE },
+    { label: 'BOM', value: ApplicationType.BOM }
   ];
 
   selectedColumns: ColumnData[] = [
@@ -149,10 +149,6 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
     console.log(`Row unselected ${JSON.stringify($event)}`)
   }
 
-  isLibrary(appType: ApplicationType): boolean {
-    return appType === ApplicationType.LIBRARY;
-  }
-
   clear(table: Table) {
     table.clear();
   }
@@ -177,7 +173,7 @@ export class ProjectViewComponent implements OnInit, OnDestroy {
 
 }
 
-interface ToggleView {
+export interface ToggleView {
   value: number,
   name: string
 }

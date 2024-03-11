@@ -20,4 +20,6 @@ public class ApplicationFullDto extends ApplicationLiteDto {
 	private List<String> dependencies;
 	
 	private List<String> managementDependencies;
+
+	private List<DependencyManagementDto> dependencyManagements;
 }

@@ -23,5 +23,6 @@ export interface ApplicationLiteDto {
 
 export enum ApplicationType {
     MICROSERVICE = 'MICROSERVICE',
-    LIBRARY = 'LIBRARY' 
+    LIBRARY = 'LIBRARY',
+    BOM = 'BOM'
 }

@@ -1,7 +1,13 @@
 import groovy.json.JsonOutput
 
-static def getDependencyFormatted(String group, String name, String version) {
-    return String.format("%s:%s:%s", group, name, version)
+static def getDependencyFormatted(String... array) {
+    return String.join(":", array)
+}
+
+static def convertMapToList(Map<String, String> dependencies) {
+    return dependencies.collect {
+        getDependencyFormatted(it.getKey(), it.getValue())
+    }
 }
 
 static def stringToLabel(String string) {
@@ -23,33 +29,102 @@ def getJavaVersion() {
 }
 
 def getFirstLevelModuleDependencies() {
-    return configurations.runtimeClasspath.resolvedConfiguration.getFirstLevelModuleDependencies().collect {
+    Map<String, String> dependencies = [:]
+
+    configurations.runtimeClasspath.resolvedConfiguration.getFirstLevelModuleDependencies().each {
 //        [
 //                groupId: it.getModuleGroup(),
 //                artifactId: it.getModuleName(),
 //                version: it.getModuleVersion()
 //        ]
-        getDependencyFormatted(it.getModuleGroup(), it.getModuleName(), it.getModuleVersion())
+        // Project modules
+        if (it.parentArtifacts.toString().contains('project :')) {
+            it.children.each { ch ->
+                dependencies.put(getDependencyFormatted(ch.getModuleGroup(), ch.getModuleName()), ch.getModuleVersion())
+            }
+        }
+        dependencies.put(getDependencyFormatted(it.getModuleGroup(), it.getModuleName()), it.getModuleVersion())
     }
+
+    return dependencies
 }
 
-def getManagementDependencies() {
+def getAllDependencies() {
+    Map<String, String> dependencies = [:]
+
+    configurations.runtimeClasspath.resolvedConfiguration.getResolvedArtifacts().each {
+        dependencies.put(getDependencyFormatted(it.owner.id.group, it.owner.id.name), it.owner.version)
+    }
+
+    return dependencies
+
+//    return configurations.runtimeClasspath.resolvedConfiguration.getResolvedArtifacts().collect{it.owner.toString()}
+}
+
+Map<String, Object> getManagementDependencies(Map<String, String> dependencies) {
+    if (!project.hasProperty('dependencyManagement')) {
+        return [:]
+    }
+
+    Map<String, Object> bomDetails = [:]
+
+    def boms = dependencyManagement.getPomConfigurer().dependencyManagement.importedBoms
+    if (boms.size() > 0) {
+        def poms = dependencyManagement.getPomConfigurer().dependencyManagement.pomResolver.resolvePoms(boms, boms[0].getProperties())
+        poms.each {
+
+            def pomCoordinates = getDependencyFormatted(it.getCoordinates().groupId, it.getCoordinates().artifactId, it.getCoordinates().version)
+            Map<String, String> dependency = [:]
+            it.getManagedDependencies().each {
+                def dependencyVersion = getDependencyFormatted(it.getCoordinates().groupId, it.getCoordinates().artifactId)
+                if (dependencies.containsKey(dependencyVersion)) {
+                    dependency.put(dependencyVersion, it.getCoordinates().version)
+                }
+            }
+
+            bomDetails.put(pomCoordinates, dependency)
+        }
+    }
+
+    return bomDetails
+}
+
+def getManagementDependenciesExplicit() {
     if (!project.hasProperty('dependencyManagement')) {
         return []
     }
-    return dependencyManagement.getPomConfigurer().dependencyManagement.importedBoms.collect {
-        getDependencyFormatted(it.coordinates.groupId, it.coordinates.artifactId, it.coordinates.version)
+
+    def versionsMap = [:]
+
+    if (project.hasProperty('dependencyVersions')) {
+        dependencyVersions.each { key, val ->
+            def newKey = "\${$key}"
+            versionsMap[newKey] = val
+        }
+    }
+
+    return dependencyManagement.getPomConfigurer().dependencyManagement.explicitVersions.collect { key, val ->
+        final def version = versionsMap.containsKey(val) ? versionsMap.get(val) : val
+        final def split = key.split(':')
+        final def groupId = split[0]
+        final def artifactId = split[1]
+        return getDependencyFormatted(groupId, artifactId, version)
     }
 }
 
 def getApplicationJson() {
-    def dependencies = getFirstLevelModuleDependencies()
-    def managementDependencies = getManagementDependencies()
+    def directDependenciesMap = getFirstLevelModuleDependencies()
+    def fullDependenciesMap = getAllDependencies()
+
+    def directDependencies = convertMapToList(directDependenciesMap)
+    def fullDependencies = convertMapToList(fullDependenciesMap)
+
+    def managementDependencies = getManagementDependencies(fullDependenciesMap)
 
     Map<String, Object> app = [
-            name: project.getName(),
-            label: getApplicationExtProperty('name', stringToLabel(project.getName())),
-            group: project.getGroup(),
+            name   : project.getName(),
+            label  : getApplicationExtProperty('name', stringToLabel(project.getName())),
+            group  : project.getGroup(),
             version: project.getVersion()
     ]
 
@@ -57,6 +132,12 @@ def getApplicationJson() {
     String description = getApplicationDescription()
     if (description != null) {
         app.put('description', description)
+    }
+
+    // Type
+    String type = getApplicationExtProperty('type', null)
+    if (type != null) {
+        app.put('type', type)
     }
 
     // Owner
@@ -72,16 +153,26 @@ def getApplicationJson() {
     }
 
     app.put('tags', [
-            java: getJavaVersion(),
-            gradle: project.getGradle().getGradleVersion()
+            java                        : getJavaVersion(),
+            gradle                      : project.getGradle().getGradleVersion(),
+            'Overridden by dependencies': !(project.hasProperty('dependencyManagement') && !dependencyManagement.dependencyManagementSettings.overriddenByDependencies)
     ])
 
-    if (dependencies.size() > 0) {
-        app.put('dependencies', dependencies)
+    if (directDependencies.size() > 0) {
+        app.put('dependencies', directDependencies)
+    }
+
+    if (fullDependencies.size() > 0) {
+        app.put('fullDependencies', fullDependencies)
     }
 
     if (managementDependencies.size() > 0) {
-        app.put('managementDependencies', managementDependencies)
+        app.put('managementDependencies', managementDependencies.collect { it.getKey() })
+        app.put('dependencyManagement', managementDependencies)
+    }
+
+    if (type == 'bom' && managementDependenciesExplicit.size() > 0) {
+        app.put('dependencies', managementDependenciesExplicit)
     }
     return app
 }

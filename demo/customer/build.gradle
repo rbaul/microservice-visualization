@@ -6,7 +6,9 @@ plugins {
 
 group = 'com.demo'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
 description = 'Customer application'
 
 apply from: '../../plugins/gradle/dependencies-util.gradle'
@@ -15,6 +17,7 @@ ext {
     springCloudVersion = '2021.0.5'
     name = 'Customer'
     ownerName = 'Team 1'
+    type = 'microservice'
 }
 
 configurations {

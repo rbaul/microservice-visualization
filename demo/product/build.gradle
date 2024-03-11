@@ -6,12 +6,15 @@ plugins {
 
 group = 'com.demo'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+}
 description = 'Product application'
 
 ext {
     name = 'Product'
     ownerName = 'Team 3'
+	type = 'microservice'
 }
 
 apply from: '../../plugins/gradle/dependencies-util.gradle'

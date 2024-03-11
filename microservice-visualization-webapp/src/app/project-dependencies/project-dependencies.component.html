@@ -1,18 +1,21 @@
 <p-toolbar>
     <div class="p-toolbar-group-start">
         Dependencies of {{data.projectVersion.name}}
+        <button label="Open Project" pButton pRipple icon="pi pi-external-link" class="p-button-text"
+            (click)="openProject()"></button>
     </div>
     <p-tag value="{{data.version}}" severity="success"></p-tag>
     <div class="p-toolbar-group-end">
-        <button label="Open Project" pButton pRipple icon="pi pi-external-link" class="p-button-text"
-            (click)="openProject()"></button>
+        <!-- <p-button (click)="sidebarVisible = true" icon="pi pi-arrow-right"></p-button> -->
+        <p-selectButton [options]="toggleOptions" [(ngModel)]="toggleSelect" (onChange)="filterChange($event.value)" optionLabel="name"
+            optionValue="value"></p-selectButton>
     </div>
 </p-toolbar>
 <p-table #dt1 [value]="data.dependencies" [tableStyle]="{ 'min-width': '50rem' }" [paginator]="true" [rows]="25"
     [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-    [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="calc(80vh - 200px)" (sortFunction)="customSort($event)" [customSort]="true"
-    [styleClass]="'p-datatable-sm'" [resizableColumns]="true" [reorderableColumns]="true"
-    [globalFilterFields]="globalFilterFields">
+    [rowsPerPageOptions]="[10, 25, 50]" [scrollable]="true" scrollHeight="calc(80vh - 200px)"
+    (sortFunction)="customSort($event)" [customSort]="true" [styleClass]="'p-datatable-sm'" [resizableColumns]="true"
+    [reorderableColumns]="true" [globalFilterFields]="globalFilterFields">
 
     <ng-template pTemplate="caption">
         <div class="flex">

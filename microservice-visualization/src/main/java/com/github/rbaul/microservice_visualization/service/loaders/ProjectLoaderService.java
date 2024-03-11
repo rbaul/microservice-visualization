@@ -25,6 +25,8 @@ public abstract class ProjectLoaderService {
 
     public static final String APPLICATIONS_FOLDER = "applications";
     public static final String LIBRARIES_FOLDER = "libraries";
+
+    public static final String BOMS_FOLDER = "boms";
     public static final String PROJECT_CONFIG_YAML = "project-config.yaml";
 
     protected final MicroserviceVisualizationProperties properties;
@@ -176,7 +178,30 @@ public abstract class ProjectLoaderService {
         application.setGroup(applicationDependency.group());
         application.setVersion(applicationDependency.version());
         application.setDependencies(applicationDependency.dependencies());
-        application.setManagementDependencies(applicationDependency.managementDependencies());
+
+        Set<String> dependencyManagements;
+
+        if (!CollectionUtils.isEmpty(applicationDependency.dependencyManagement())) {
+            application.setDependencyManagements(applicationDependency.dependencyManagement().entrySet().stream()
+                    .map(entry -> ConverterUtils.mapToDependencyManagement(entry.getKey(), entry.getValue())).collect(Collectors.toList()));
+
+            dependencyManagements = application.getDependencyManagements().stream()
+                    .map(DependencyManagement::getDependencies)
+                    .flatMap(List::stream).collect(Collectors.toSet());
+        } else {
+            dependencyManagements = new HashSet<>();
+        }
+
+        if (!CollectionUtils.isEmpty(applicationDependency.fullDependencies())) {
+            application.setFullDependencies(applicationDependency.fullDependencies().stream()
+                    .map(dependencyString -> getDependencyEntity(dependencyString, dependencyManagements))
+                    .collect(Collectors.toList()));
+        } else if (!CollectionUtils.isEmpty(applicationDependency.dependencies())) {
+            application.setFullDependencies(applicationDependency.dependencies().stream()
+                    .map(dependencyString -> getDependencyEntity(dependencyString, dependencyManagements))
+                    .collect(Collectors.toList()));
+        }
+
         Map<String, String> tags = new HashMap<>(applicationDependency.tags());
 
         Map<String, String> relevantTags = properties.getTags();
@@ -189,6 +214,15 @@ public abstract class ProjectLoaderService {
         application.setTags(tags);
         application.setType(type);
         return application;
+    }
+
+    private static DependencyEntity getDependencyEntity(String dependencyString, Set<String> dependencyManagements) {
+        Dependency dep = ConverterUtils.convertDependency(dependencyString);
+        return DependencyEntity.builder()
+                .groupId(dep.packageId())
+                .artifactId(dep.name())
+                .version(dep.version())
+                .implicit(dependencyManagements.contains(dependencyString)).build();
     }
 
     /**

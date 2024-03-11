@@ -51,8 +51,10 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
         ProjectConfig projectConfiguration = getProjectConfiguration(Paths.get(MessageFormat.format("{0}/{1}", dir, PROJECT_CONFIG_YAML)));
         List<Application> applicationDependencies = getApplicationsByType(dir, APPLICATIONS_FOLDER, ApplicationType.MICROSERVICE);
         List<Application> libraryDependencies = getApplicationsByType(dir, LIBRARIES_FOLDER, ApplicationType.LIBRARY);
+        List<Application> bomDependencies = getApplicationsByType(dir, BOMS_FOLDER, ApplicationType.BOM);
         List<Application> dependencies = new ArrayList<>(applicationDependencies);
         dependencies.addAll(libraryDependencies);
+        dependencies.addAll(bomDependencies);
 
         setApplicationToProject(project, projectConfiguration, dependencies, versionId, version);
         return project;

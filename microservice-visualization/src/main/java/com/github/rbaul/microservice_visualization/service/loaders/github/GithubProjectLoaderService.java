@@ -71,8 +71,10 @@ public class GithubProjectLoaderService extends ProjectLoaderService {
 
             List<Application> applicationDependencies = getApplicationsByFolder(projectRepository, versionId, ProjectLoaderService.APPLICATIONS_FOLDER, ApplicationType.MICROSERVICE);
             List<Application> libraryDependencies = getApplicationsByFolder(projectRepository, versionId, ProjectLoaderService.LIBRARIES_FOLDER, ApplicationType.LIBRARY);
+            List<Application> bomDependencies = getApplicationsByFolder(projectRepository, versionId, ProjectLoaderService.BOMS_FOLDER, ApplicationType.BOM);
             List<Application> dependencies = new ArrayList<>(applicationDependencies);
             dependencies.addAll(libraryDependencies);
+            dependencies.addAll(bomDependencies);
             setApplicationToProject(project, projectConfigByBranch, dependencies, versionId, version);
         } catch (IOException e) {
             throw new RuntimeException(e);

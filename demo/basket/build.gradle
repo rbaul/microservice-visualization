@@ -6,7 +6,9 @@ plugins {
 
 group = 'com.demo'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = JavaVersion.VERSION_17
+java {
+	sourceCompatibility = JavaVersion.VERSION_17
+}
 description = 'Basket application'
 
 apply from: '../../plugins/gradle/dependencies-util.gradle'
@@ -15,6 +17,7 @@ ext {
     springCloudVersion = '2022.0.2'
     name = 'Basket'
     ownerName = 'Team 1'
+	type = 'microservice'
 }
 
 
