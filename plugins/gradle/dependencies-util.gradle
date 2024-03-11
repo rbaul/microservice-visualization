@@ -120,6 +120,7 @@ def getApplicationJson() {
     def fullDependencies = convertMapToList(fullDependenciesMap)
 
     def managementDependencies = getManagementDependencies(fullDependenciesMap)
+    def managementDependenciesExplicit = getManagementDependenciesExplicit()
 
     Map<String, Object> app = [
             name   : project.getName(),
