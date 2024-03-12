@@ -68,9 +68,9 @@ Map<String, Object> getManagementDependencies(Map<String, String> dependencies) 
 
     Map<String, Object> bomDetails = [:]
 
-    def boms = dependencyManagement.getPomConfigurer().dependencyManagement.importedBoms
+    def boms = dependencyManagement.getPomConfigurer().dependencyManagement.importedBomReferences
     if (boms.size() > 0) {
-        def poms = dependencyManagement.getPomConfigurer().dependencyManagement.pomResolver.resolvePoms(boms, boms[0].getProperties())
+        def poms = dependencyManagement.getPomConfigurer().dependencyManagement.pomResolver.resolvePomsLeniently(boms)
         poms.each {
 
             def pomCoordinates = getDependencyFormatted(it.getCoordinates().groupId, it.getCoordinates().artifactId, it.getCoordinates().version)
