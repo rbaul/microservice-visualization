@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,16 +67,28 @@ public class BitbucketProjectLoaderService extends ProjectLoaderService {
         return project;
     }
 
-    private List<Application> getApplicationsByFolder(LoaderDetails loaderDetails, String versionId, BitBucketV1Api api, String folderName, ApplicationType appType) {
+    private List<Application> getApplicationsByFolder(LoaderDetails loaderDetails, String versionId, BitBucketV1Api api, String folderName, ApplicationType defaultType) {
         try {
             List<String> allApplicationsByBranch = api.getAllApplicationsByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName);
-            return allApplicationsByBranch.stream().map(applicationFileName ->
-                            convertApplicationDependencyToApplication(getApplicationDependency(api.getApplicationByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName, applicationFileName)),
-                                    appType))
-                    .toList();
+
+            return allApplicationsByBranch.stream()
+                    .map(applicationFileName -> readContent(loaderDetails, versionId, api, folderName, applicationFileName)
+                            .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed load folder: '{}'", folderName, e);
             return List.of();
+        }
+    }
+
+    protected Optional<String> readContent(LoaderDetails loaderDetails, String versionId, BitBucketV1Api api, String folderName, String applicationFileName) {
+        try {
+            return Optional.of(api.getApplicationByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName, applicationFileName));
+        } catch (Exception e) {
+            log.error("Failed read application file {}/{}", folderName, applicationFileName, e);
+            return Optional.empty();
         }
     }
 
