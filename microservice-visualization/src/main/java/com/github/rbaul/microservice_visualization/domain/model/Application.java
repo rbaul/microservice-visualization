@@ -54,9 +54,6 @@ public class Application {
 
 	@ElementCollection
 	private List<@NotNull DependencyEntity> fullDependencies;
-	
-	@ElementCollection
-	private List<@NotEmpty String> managementDependencies;
 
 	@ToString.Exclude
 	@ElementCollection

@@ -1,3 +1,10 @@
+export interface DependencyManagement {
+    groupId: string,
+    artifactId: string,
+    version: string,
+    dependencies: string[]
+}
+
 export interface ApplicationDto {
     id: number,
     name: string,
@@ -7,7 +14,7 @@ export interface ApplicationDto {
     owner: string,
     tags: Map<String, String>,
     dependencies: string[],
-    managementDependencies: string[]
+    dependencyManagements: DependencyManagement[]
 }
 
 export interface ApplicationLiteDto {

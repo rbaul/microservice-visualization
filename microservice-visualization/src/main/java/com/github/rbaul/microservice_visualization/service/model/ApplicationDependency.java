@@ -9,6 +9,7 @@ import java.util.Map;
 public record ApplicationDependency(
         String name,
         String label,
+        String type,
         String description,
         String group,
         String version,

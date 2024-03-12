@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -82,23 +82,27 @@ public class GithubProjectLoaderService extends ProjectLoaderService {
         return project;
     }
 
-    private List<Application> getApplicationsByFolder(GHRepository projectRepository, String versionId, String folderName, ApplicationType appType) {
+    private List<Application> getApplicationsByFolder(GHRepository projectRepository, String versionId, String folderName, ApplicationType defaultType) {
         try {
             List<GHContent> directoryContent = projectRepository.getDirectoryContent(folderName, versionId);
 
-            return directoryContent.stream().map(ghContent -> {
-                        try {
-                            String encodedContent = projectRepository.getFileContent(ghContent.getPath(), versionId).getContent();
-                            return convertApplicationDependencyToApplication(getApplicationDependency(encodedContent), appType);
-                        } catch (IOException e) {
-                            log.error("Failed retrieve content of '{}'", ghContent.getPath(), e);
-                            return null;
-                        }
-                    }).filter(Objects::nonNull)
-                    .toList();
+            return directoryContent.stream().map(applicationFileName -> readContent(projectRepository, applicationFileName.getPath(), versionId)
+                            .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             log.error("Failed load folder: '{}'", folderName, e);
             return List.of();
+        }
+    }
+
+    protected Optional<String> readContent(GHRepository projectRepository, String path, String versionId) {
+        try {
+            return Optional.of(projectRepository.getFileContent(path, versionId).getContent());
+        } catch (Exception e) {
+            log.error("Failed read application file {}", path, e);
+            return Optional.empty();
         }
     }
 

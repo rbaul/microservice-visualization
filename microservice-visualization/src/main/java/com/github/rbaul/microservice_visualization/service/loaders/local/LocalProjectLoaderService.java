@@ -8,7 +8,6 @@ import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
 import com.github.rbaul.microservice_visualization.domain.model.Project;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderService;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectLoaderType;
-import com.github.rbaul.microservice_visualization.service.model.ApplicationDependency;
 import com.github.rbaul.microservice_visualization.service.model.ProjectConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,13 +59,15 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
         return project;
     }
 
-    private List<Application> getApplicationsByType(String dir, String applicationsFolder, ApplicationType type) {
+    private List<Application> getApplicationsByType(String dir, String applicationsFolder, ApplicationType defaultType) {
         Path folder = Paths.get(MessageFormat.format("{0}/{1}", dir, applicationsFolder));
 
         File[] listApplicationFiles = folder.toFile().listFiles(File::isFile);
         return listApplicationFiles == null ? List.of() : Arrays.stream(listApplicationFiles)
-                .map(file -> getApplication(Paths.get(file.toURI()), type))
-                .filter(Objects::nonNull)
+                .map(file -> readContent(Paths.get(file.toURI()))
+                        .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .toList();
     }
 
@@ -80,12 +81,12 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
         return ProjectLoaderType.local;
     }
 
-    protected ApplicationDependency getApplicationDependency(Path path) {
+    protected Optional<String> readContent(Path path) {
         try {
-            return getApplicationDependency(Files.readString(path));
+            return Optional.of(Files.readString(path));
         } catch (IOException e) {
             log.error("Failed read application file {}", path, e);
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -96,14 +97,6 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
             log.error("Failed read application file {}", path, e);
             return null;
         }
-    }
-
-    protected Application getApplication(Path path, ApplicationType type) {
-        ApplicationDependency applicationDependency = getApplicationDependency(path);
-        if (applicationDependency != null) {
-            return convertApplicationDependencyToApplication(applicationDependency, type);
-        }
-        return null;
     }
 
 }

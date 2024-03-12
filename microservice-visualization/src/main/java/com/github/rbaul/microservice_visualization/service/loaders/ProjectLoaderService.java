@@ -158,62 +158,70 @@ public abstract class ProjectLoaderService {
         return tags;
     }
 
-    protected Application convertApplicationDependencyToApplication(ApplicationDependency applicationDependency, ApplicationType type) {
-        Application application = new Application();
-        application.setName(applicationDependency.name());
-        String description = StringUtils.hasText(applicationDependency.description()) ?
-                applicationDependency.description() : String.format("%s application", applicationDependency.name());
-        application.setDescription(description);
-        application.setLocation(applicationDependency.location());
-        // Owner
-        String owner = applicationDependency.owner();
-        if (StringUtils.hasText(owner)) {
-            application.setOwners(Arrays.stream(owner.split(";"))
-                    .map(String::trim)
-                    .filter(StringUtils::hasText)
-                    .collect(Collectors.toSet()));
-        }
+    protected Optional<Application> convertApplicationDependencyToApplication(ApplicationDependency applicationDependency, ApplicationType type) {
+        try {
+            Application application = new Application();
+            application.setName(applicationDependency.name());
+            String description = StringUtils.hasText(applicationDependency.description()) ?
+                    applicationDependency.description() : String.format("%s application", applicationDependency.name());
+            application.setDescription(description);
+            application.setLocation(applicationDependency.location());
+            // Owner
+            String owner = applicationDependency.owner();
+            if (StringUtils.hasText(owner)) {
+                application.setOwners(Arrays.stream(owner.split(";"))
+                        .map(String::trim)
+                        .filter(StringUtils::hasText)
+                        .collect(Collectors.toSet()));
+            }
 
-        application.setLabel(applicationDependency.label());
-        application.setGroup(applicationDependency.group());
-        application.setVersion(applicationDependency.version());
-        application.setDependencies(applicationDependency.dependencies());
+            application.setLabel(applicationDependency.label());
+            application.setGroup(applicationDependency.group());
+            application.setVersion(applicationDependency.version());
+            application.setDependencies(applicationDependency.dependencies());
 
-        Set<String> dependencyManagements;
+            List<DependencyManagement> dependencyManagements = new ArrayList<>();
 
-        if (!CollectionUtils.isEmpty(applicationDependency.dependencyManagement())) {
-            application.setDependencyManagements(applicationDependency.dependencyManagement().entrySet().stream()
-                    .map(entry -> ConverterUtils.mapToDependencyManagement(entry.getKey(), entry.getValue())).collect(Collectors.toList()));
+            if (!CollectionUtils.isEmpty(applicationDependency.dependencyManagement())) {
+                dependencyManagements = applicationDependency.dependencyManagement().entrySet().stream()
+                        .map(entry -> ConverterUtils.mapToDependencyManagement(entry.getKey(), entry.getValue())).collect(Collectors.toList());
+            } else if (!CollectionUtils.isEmpty(applicationDependency.managementDependencies())) {
+                dependencyManagements = applicationDependency.managementDependencies().stream()
+                        .map(entry -> ConverterUtils.mapToDependencyManagement(entry, new HashMap<>()))
+                        .collect(Collectors.toList());
+            }
+            application.setDependencyManagements(dependencyManagements);
 
-            dependencyManagements = application.getDependencyManagements().stream()
+            Set<String> fullDependencyManagements = application.getDependencyManagements().stream()
                     .map(DependencyManagement::getDependencies)
                     .flatMap(List::stream).collect(Collectors.toSet());
-        } else {
-            dependencyManagements = new HashSet<>();
+
+            if (!CollectionUtils.isEmpty(applicationDependency.fullDependencies())) {
+                application.setFullDependencies(applicationDependency.fullDependencies().stream()
+                        .map(dependencyString -> getDependencyEntity(dependencyString, fullDependencyManagements))
+                        .collect(Collectors.toList()));
+            } else if (!CollectionUtils.isEmpty(applicationDependency.dependencies())) {
+                application.setFullDependencies(applicationDependency.dependencies().stream()
+                        .map(dependencyString -> getDependencyEntity(dependencyString, fullDependencyManagements))
+                        .collect(Collectors.toList()));
+            }
+
+            Map<String, String> tags = new HashMap<>(applicationDependency.tags());
+
+            Map<String, String> relevantTags = properties.getTags();
+
+            // Management dependencies
+            tags.putAll(findTags(applicationDependency.managementDependencies(), relevantTags));
+
+            // Dependencies
+            tags.putAll(findTags(applicationDependency.dependencies(), relevantTags));
+            application.setTags(tags);
+            application.setType(type);
+            return Optional.of(application);
+        } catch (Exception e) {
+            log.error("Failed convert ApplicationDependency {} -> Application", applicationDependency.name(), e);
+            return Optional.empty();
         }
-
-        if (!CollectionUtils.isEmpty(applicationDependency.fullDependencies())) {
-            application.setFullDependencies(applicationDependency.fullDependencies().stream()
-                    .map(dependencyString -> getDependencyEntity(dependencyString, dependencyManagements))
-                    .collect(Collectors.toList()));
-        } else if (!CollectionUtils.isEmpty(applicationDependency.dependencies())) {
-            application.setFullDependencies(applicationDependency.dependencies().stream()
-                    .map(dependencyString -> getDependencyEntity(dependencyString, dependencyManagements))
-                    .collect(Collectors.toList()));
-        }
-
-        Map<String, String> tags = new HashMap<>(applicationDependency.tags());
-
-        Map<String, String> relevantTags = properties.getTags();
-
-        // Management dependencies
-        tags.putAll(findTags(applicationDependency.managementDependencies(), relevantTags));
-
-        // Dependencies
-        tags.putAll(findTags(applicationDependency.dependencies(), relevantTags));
-        application.setTags(tags);
-        application.setType(type);
-        return application;
     }
 
     private static DependencyEntity getDependencyEntity(String dependencyString, Set<String> dependencyManagements) {
@@ -242,13 +250,26 @@ public abstract class ProjectLoaderService {
         return tags;
     }
 
-    protected ApplicationDependency getApplicationDependency(String fileContent) {
+    protected Optional<ApplicationDependency> getApplicationDependency(String fileContent) {
         try {
-            return objectMapper.readValue(fileContent, ApplicationDependency.class);
+            return Optional.of(objectMapper.readValue(fileContent, ApplicationDependency.class));
         } catch (IOException e) {
             log.error("Failed read application file", e);
-            return null;
+            return Optional.empty();
         }
+    }
+
+    protected Optional<Application> convertContentToApplication(String fileContent, ApplicationType defaultType) {
+        return getApplicationDependency(fileContent)
+                .flatMap(appDep -> convertApplicationDependencyToApplication(appDep, defaultType));
+    }
+
+    protected List<Application> convertContentToApplication(List<String> filesContent, ApplicationType defaultType) {
+        return filesContent.stream()
+                .map(content -> convertContentToApplication(content, defaultType))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     /**
