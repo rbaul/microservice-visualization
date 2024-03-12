@@ -2,6 +2,7 @@ package com.github.rbaul.microservice_visualization.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public class Application {
 	private String location;
 
 	@ElementCollection
-	private Set<String> owners;
+	private Set<@NotEmpty String> owners;
 
 	@Enumerated(EnumType.STRING)
 	private ApplicationType type;
@@ -49,10 +50,17 @@ public class Application {
 	private Map<String, String> tags;
 	
 	@ElementCollection
-	private List<String> dependencies;
+	private List<@NotEmpty String> dependencies;
+
+	@ElementCollection
+	private List<@NotNull DependencyEntity> fullDependencies;
 	
 	@ElementCollection
-	private List<String> managementDependencies;
+	private List<@NotEmpty String> managementDependencies;
+
+	@ToString.Exclude
+	@ElementCollection
+	private List<@NotNull DependencyManagement> dependencyManagements;
 	
 	@ToString.Exclude
 	@ManyToOne(fetch = FetchType.LAZY)

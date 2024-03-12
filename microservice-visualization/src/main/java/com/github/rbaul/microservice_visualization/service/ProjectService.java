@@ -1,9 +1,6 @@
 package com.github.rbaul.microservice_visualization.service;
 
-import com.github.rbaul.microservice_visualization.domain.model.Application;
-import com.github.rbaul.microservice_visualization.domain.model.LoaderDetails;
-import com.github.rbaul.microservice_visualization.domain.model.Project;
-import com.github.rbaul.microservice_visualization.domain.model.ProjectVersion;
+import com.github.rbaul.microservice_visualization.domain.model.*;
 import com.github.rbaul.microservice_visualization.domain.repository.ProjectRepository;
 import com.github.rbaul.microservice_visualization.domain.repository.ProjectVersionRepository;
 import com.github.rbaul.microservice_visualization.exception.MicroserviceVisualizationException;
@@ -22,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -113,16 +111,87 @@ public class ProjectService {
         Map<String, DependencyDto> dependencies = new HashMap<>();
         Set<Application> applications = project.getApplications();
         for (Application application : applications) {
-            for (String dependencyString : application.getDependencies()) {
-                Dependency dependency = ConverterUtils.convertDependency(dependencyString);
-
-                if (!dependencies.containsKey(dependencyString)) {
-                    dependencies.put(dependencyString, DependencyDto.builder()
-                            .packageName(dependency.packageId())
-                            .artifactName(dependency.name())
-                            .version(dependency.version()).build());
+            if (application.getType() != ApplicationType.BOM) {
+                for (DependencyEntity dependency : application.getFullDependencies()) {
+                    String dependencyString = ConverterUtils.getDependencyFormatted(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
+                    if (!dependencies.containsKey(dependencyString)) {
+                        dependencies.put(dependencyString, DependencyDto.builder()
+                                .packageName(dependency.getGroupId())
+                                .artifactName(dependency.getArtifactId())
+                                .version(dependency.getVersion()).build());
+                    }
+                    dependencies.get(dependencyString).getUsageOf().add(application.getName());
                 }
-                dependencies.get(dependencyString).getUsageOf().add(application.getName());
+            }
+        }
+
+        ProjectVersion projectVersion = project.getProjectVersion();
+        ProjectVersionLiteDto projectVersionLiteDto = modelMapper.map(projectVersion, ProjectVersionLiteDto.class);
+        return ProjectDependenciesDto.builder()
+                .id(project.getId())
+                .version(project.getVersion())
+                .dependencies(new HashSet<>(dependencies.values()))
+                .projectVersion(projectVersionLiteDto).build();
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectDependenciesDto getImplicitDependencies(int id) {
+        Project project = getById(id);
+
+        Map<String, DependencyDto> dependencies = new HashMap<>();
+        Set<Application> applications = project.getApplications();
+        for (Application application : applications) {
+            if (application.getType() != ApplicationType.BOM) {
+                for (String dependencyString : application.getDependencies()) {
+
+                    Set<String> dependencyManagements = application.getDependencyManagements().stream()
+                            .map(DependencyManagement::getDependencies)
+                            .flatMap(List::stream).collect(Collectors.toSet());
+
+                    if (!dependencyManagements.contains(dependencyString)) {
+                        Dependency dependency = ConverterUtils.convertDependency(dependencyString);
+
+                        if (!dependencies.containsKey(dependencyString)) {
+                            dependencies.put(dependencyString, DependencyDto.builder()
+                                    .packageName(dependency.packageId())
+                                    .artifactName(dependency.name())
+                                    .version(dependency.version()).build());
+                        }
+                        dependencies.get(dependencyString).getUsageOf().add(application.getName());
+                    }
+                }
+            }
+        }
+
+        ProjectVersion projectVersion = project.getProjectVersion();
+        ProjectVersionLiteDto projectVersionLiteDto = modelMapper.map(projectVersion, ProjectVersionLiteDto.class);
+        return ProjectDependenciesDto.builder()
+                .id(project.getId())
+                .version(project.getVersion())
+                .dependencies(new HashSet<>(dependencies.values()))
+                .projectVersion(projectVersionLiteDto).build();
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectDependenciesDto getDirectDependencies(int id) {
+        Project project = getById(id);
+
+        Map<String, DependencyDto> dependencies = new HashMap<>();
+        Set<Application> applications = project.getApplications();
+        for (Application application : applications) {
+            if (application.getType() != ApplicationType.BOM) {
+                for (String dependencyString : application.getDependencies()) {
+
+                    Dependency dependency = ConverterUtils.convertDependency(dependencyString);
+
+                    if (!dependencies.containsKey(dependencyString)) {
+                        dependencies.put(dependencyString, DependencyDto.builder()
+                                .packageName(dependency.packageId())
+                                .artifactName(dependency.name())
+                                .version(dependency.version()).build());
+                    }
+                    dependencies.get(dependencyString).getUsageOf().add(application.getName());
+                }
             }
         }
 

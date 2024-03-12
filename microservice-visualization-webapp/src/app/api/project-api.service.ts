@@ -27,6 +27,14 @@ export class ProjectApiService {
       { params: new HttpParams().set('projectVersionId', projectVersionId) });
   }
 
+  public getDirectDependencies(id: number): Observable<ProjectDependenciesDto> {
+    return this.http.get<ProjectDependenciesDto>(`${API_URL}/${id}/dependencies/direct`, httpJsonOptions);
+  }
+
+  public getImplicitDependencies(id: number): Observable<ProjectDependenciesDto> {
+    return this.http.get<ProjectDependenciesDto>(`${API_URL}/${id}/dependencies/implicit`, httpJsonOptions);
+  }
+
   public getDependencies(id: number): Observable<ProjectDependenciesDto> {
     return this.http.get<ProjectDependenciesDto>(`${API_URL}/${id}/dependencies`, httpJsonOptions);
   }

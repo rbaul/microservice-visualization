@@ -49,4 +49,14 @@ public class ProjectController {
     public ProjectDependenciesDto getDependencies(@PathVariable("id") int id) {
         return projectService.getDependencies(id);
     }
+
+    @GetMapping("/{id}/dependencies/implicit")
+    public ProjectDependenciesDto getImplicitDependencies(@PathVariable("id") int id) {
+        return projectService.getImplicitDependencies(id);
+    }
+
+    @GetMapping("/{id}/dependencies/direct")
+    public ProjectDependenciesDto getDirectDependencies(@PathVariable("id") int id) {
+        return projectService.getDirectDependencies(id);
+    }
 }

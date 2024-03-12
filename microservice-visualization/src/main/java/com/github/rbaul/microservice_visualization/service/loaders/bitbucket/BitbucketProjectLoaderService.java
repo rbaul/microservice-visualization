@@ -56,8 +56,11 @@ public class BitbucketProjectLoaderService extends ProjectLoaderService {
 
         List<Application> libraryDependencies = getApplicationsByFolder(loaderDetails, versionId, api, ProjectLoaderService.LIBRARIES_FOLDER, ApplicationType.LIBRARY);
 
+        List<Application> bomDependencies = getApplicationsByFolder(loaderDetails, versionId, api, ProjectLoaderService.BOMS_FOLDER, ApplicationType.BOM);
+
         List<Application> dependencies = new ArrayList<>(applicationDependencies);
         dependencies.addAll(libraryDependencies);
+        dependencies.addAll(bomDependencies);
 
         setApplicationToProject(project, projectConfigByBranch, dependencies, versionId, version);
         return project;

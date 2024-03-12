@@ -50,10 +50,16 @@
           <ng-template pTemplate="filter" let-value let-filter="filterCallback">
             <p-dropdown [ngModel]="value" [options]="types" (onChange)="filter($event.value)" placeholder="Any">
               <ng-template let-option pTemplate="item">
-                @if (isLibrary(option.value)) {
-                <p-tag value="{{option.value | lowercase}}" severity="warning"></p-tag>
-                } @else {
-                <p-tag value="{{option.value | lowercase}}" severity="success"></p-tag>
+                @switch (option.value) {
+                  @case ('LIBRARY') {
+                    <p-tag value="{{option.value | lowercase}}" severity="warning"></p-tag>
+                  }
+                  @case ('MICROSERVICE') {
+                    <p-tag value="{{option.value | lowercase}}" severity="success"></p-tag>
+                  }
+                  @case ('BOM') {
+                    <p-tag value="{{option.value | lowercase}}" severity="danger"></p-tag>
+                  }
                 }
               </ng-template>
             </p-dropdown>
@@ -78,10 +84,16 @@
         <a class="name-link" href="{{ app.location }}" target="_blank">{{ app.name }}</a>
       </td>
       <td>
-        @if (isLibrary(app.type)) {
-        <p-tag value="{{app.type | lowercase}}" severity="warning"></p-tag>
-        } @else {
-        <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
+        @switch (app.type) {
+          @case ('LIBRARY') {
+            <p-tag value="{{app.type | lowercase}}" severity="warning"></p-tag>
+          }
+          @case ('MICROSERVICE') {
+            <p-tag value="{{app.type | lowercase}}" severity="success"></p-tag>
+          }
+          @case ('BOM') {
+            <p-tag value="{{app.type | lowercase}}" severity="danger"></p-tag>
+          }
         }
       </td>
       @for (column of selectedColumns; track $index) {

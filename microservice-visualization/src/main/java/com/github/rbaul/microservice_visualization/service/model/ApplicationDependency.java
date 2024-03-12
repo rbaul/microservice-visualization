@@ -16,6 +16,8 @@ public record ApplicationDependency(
         String owner,
         Map<String, String> tags,
         List<String> dependencies,
-        List<String> managementDependencies
+        List<String> fullDependencies,
+        List<String> managementDependencies,
+        Map<String, Map<String, String>> dependencyManagement
 ) {
 }

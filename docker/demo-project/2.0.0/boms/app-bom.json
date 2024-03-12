@@ -1,0 +1,20 @@
+{
+    "name": "app-bom",
+    "label": "Application BOM",
+    "group": "com.demo",
+    "version": "0.0.1-SNAPSHOT",
+    "description": "Application BOM",
+    "type": "bom",
+    "owner": "Team 1",
+    "tags": {
+        "java": "17",
+        "gradle": "8.5",
+        "Overridden by dependencies": true
+    },
+    "dependencies": [
+        "commons-io:commons-io:2.11.0",
+        "org.apache.commons:commons-collections4:4.4",
+        "com.google.guava:guava:31.1-jre",
+        "org.jgrapht:jgrapht-core:1.5.1"
+    ]
+}

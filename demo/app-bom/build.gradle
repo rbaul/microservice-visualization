@@ -1,0 +1,66 @@
+plugins {
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+}
+
+group = 'com.demo'
+version = '0.0.1-SNAPSHOT'
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+description = 'Application BOM'
+
+apply from: '../../plugins/gradle/dependencies-util.gradle'
+
+ext {
+    name = 'Application BOM'
+    ownerName = 'Team 1'
+    type = 'bom'
+}
+
+project.ext.dependencyVersions = [
+        "commons-collections4.version": "4.4",
+        "commons-io.version"          : "2.11.0",
+        "jgrapht-core.version"        : "1.5.1",
+        "guava.version"               : "31.1-jre",
+]
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    dependencies {
+        /**
+         * The Apache Commons Collections package contains types that extend and augment the Java Collections Framework.
+         * https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+         */
+        dependency 'org.apache.commons:commons-collections4:${commons-collections4.version}'
+        /**
+         * The Apache Commons IO library contains utility classes, stream implementations, file filters, file comparators, endian transformation classes, and much more.
+         * https://mvnrepository.com/artifact/commons-io/commons-io
+         */
+        dependency 'commons-io:commons-io:${commons-io.version}'
+        /*
+         * JGraphT Core
+         * https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core
+         */
+        dependency 'org.jgrapht:jgrapht-core:${jgrapht-core.version}'
+        /**
+         * Guava is a suite of core and expanded libraries that include utility classes, Google's collections, I/O classes, and much more.
+         * https://mvnrepository.com/artifact/com.google.guava/guava
+         */
+        dependency 'com.google.guava:guava:${guava.version}'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
