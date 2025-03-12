@@ -95,7 +95,7 @@ public abstract class ProjectLoaderService {
                 });
 
         project.getApplications().stream()
-                .filter(application -> application.getType() == ApplicationType.MICROSERVICE)
+                .filter(application -> application.getType() == ApplicationType.MICROSERVICE && application.getDependencies() != null)
                 .forEach(application -> application.getDependencies().forEach(dep -> {
                     Dependency dependency = ConverterUtils.convertDependency(dep);
                     if (apiNameToOwnerAppName.containsKey(dependency.name()) && !apiNameToOwnerAppName.get(dependency.name()).equals(application.getName())) {
