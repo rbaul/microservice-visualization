@@ -2,6 +2,7 @@ package com.github.rbaul.microservice_visualization.service.loaders.bitbucket;
 
 import com.github.rbaul.microservice_visualization.service.ProjectService;
 import com.github.rbaul.microservice_visualization.service.loaders.ProjectNotificationType;
+import com.github.rbaul.microservice_visualization.service.loaders.bitbucket.dtos.NativeWebHookDto;
 import com.github.rbaul.microservice_visualization.service.loaders.bitbucket.dtos.WebHookDto;
 import com.github.rbaul.microservice_visualization.utils.BitbucketConverterUtils;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,38 @@ public class NotifierController {
             }
         }
 
+    }
+
+    /**
+     * Bitbucket Data Center native webhook endpoint (repo:refs_changed event).
+     */
+    @PostMapping("/notifier/native")
+    public void nativeNotifier(@RequestBody NativeWebHookDto nativeWebHookDto) {
+        log.info("Received bitbucket native notification: '{}'", nativeWebHookDto);
+        String repositoryName = nativeWebHookDto.repository().slug();
+        String projectName = nativeWebHookDto.repository().project().key()
+                .replaceFirst("~", ""); // Fixed user private project
+        String fullName = BitbucketConverterUtils.getFullName(projectName, repositoryName);
+
+        for (NativeWebHookDto.ChangeDto change : nativeWebHookDto.changes()) {
+            if (change.ref().type() != NativeWebHookDto.RefType.BRANCH) {
+                continue;
+            }
+            String branchName = change.ref().displayId();
+            switch (change.type()) {
+                case ADD -> {
+                    log.info("Branch created: '{}' in '{}'", branchName, fullName);
+                    projectService.create(fullName, branchName);
+                }
+                case DELETE -> {
+                    log.info("Branch deleted: '{}' in '{}'", branchName, fullName);
+                    projectService.delete(fullName, branchName);
+                }
+                case UPDATE -> {
+                    log.info("Branch updated: '{}' in '{}'", branchName, fullName);
+                    projectService.update(fullName, branchName);
+                }
+            }
+        }
     }
 }
