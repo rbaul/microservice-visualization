@@ -62,7 +62,7 @@ public class LocalProjectLoaderService extends ProjectLoaderService {
     private List<Application> getApplicationsByType(String dir, String applicationsFolder, ApplicationType defaultType) {
         Path folder = Paths.get(MessageFormat.format("{0}/{1}", dir, applicationsFolder));
 
-        File[] listApplicationFiles = folder.toFile().listFiles(File::isFile);
+        File[] listApplicationFiles = folder.toFile().listFiles(file -> file.isFile() && file.getName().toLowerCase().endsWith(".json"));
         return listApplicationFiles == null ? List.of() : Arrays.stream(listApplicationFiles)
                 .map(file -> readContent(Paths.get(file.toURI()))
                         .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))

@@ -86,7 +86,9 @@ public class GithubProjectLoaderService extends ProjectLoaderService {
         try {
             List<GHContent> directoryContent = projectRepository.getDirectoryContent(folderName, versionId);
 
-            return directoryContent.stream().map(applicationFileName -> readContent(projectRepository, applicationFileName.getPath(), versionId)
+            return directoryContent.stream()
+                    .filter(ghContent -> ghContent.getName().toLowerCase().endsWith(".json"))
+                    .map(applicationFileName -> readContent(projectRepository, applicationFileName.getPath(), versionId)
                             .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))
                     .filter(Optional::isPresent)
                     .map(Optional::get)

@@ -72,6 +72,7 @@ public class BitbucketProjectLoaderService extends ProjectLoaderService {
             List<String> allApplicationsByBranch = api.getAllApplicationsByBranch(loaderDetails.getProject(), loaderDetails.getRepo(), versionId, folderName);
 
             return allApplicationsByBranch.stream()
+                    .filter(fileName -> fileName.toLowerCase().endsWith(".json"))
                     .map(applicationFileName -> readContent(loaderDetails, versionId, api, folderName, applicationFileName)
                             .flatMap(contentString -> convertContentToApplication(contentString, defaultType)))
                     .filter(Optional::isPresent)
