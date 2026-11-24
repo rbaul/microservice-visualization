@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface ProjectVersionRepository extends JpaRepository<ProjectVersion, Integer> {
     Optional<ProjectVersion> findByFullName(String fullName);
+
+    Optional<ProjectVersion> findByName(String name);
 }

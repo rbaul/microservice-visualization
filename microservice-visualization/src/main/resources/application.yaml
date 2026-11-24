@@ -28,6 +28,14 @@ spring:
     virtual:
       enabled: true
 
+  ai:
+    mcp:
+      server:
+        protocol: STATELESS
+        name: microservice-visualization-mcp
+        version: 1.0.0
+        instructions: "MCP server for exploring microservice architecture: project versions, applications, dependencies, topology connections, and cyclic dependency detection."
+
 logging:
   level:
     ROOT: info

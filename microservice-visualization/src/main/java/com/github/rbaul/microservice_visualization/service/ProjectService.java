@@ -173,6 +173,43 @@ public class ProjectService {
     }
 
     @Transactional(readOnly = true)
+    public ProjectDependenciesDto getExplicitDependencies(int id) {
+        Project project = getById(id);
+
+        Map<String, DependencyDto> dependencies = new HashMap<>();
+        Set<Application> applications = project.getApplications();
+        for (Application application : applications) {
+            if (application.getType() != ApplicationType.BOM) {
+                Set<String> dependencyManagements = application.getDependencyManagements().stream()
+                        .map(DependencyManagement::getDependencies)
+                        .flatMap(List::stream).collect(Collectors.toSet());
+
+                for (String dependencyString : application.getDependencies()) {
+                    if (dependencyManagements.contains(dependencyString)) {
+                        Dependency dependency = ConverterUtils.convertDependency(dependencyString);
+
+                        if (!dependencies.containsKey(dependencyString)) {
+                            dependencies.put(dependencyString, DependencyDto.builder()
+                                    .packageName(dependency.packageId())
+                                    .artifactName(dependency.name())
+                                    .version(dependency.version()).build());
+                        }
+                        dependencies.get(dependencyString).getUsageOf().add(application.getName());
+                    }
+                }
+            }
+        }
+
+        ProjectVersion projectVersion = project.getProjectVersion();
+        ProjectVersionLiteDto projectVersionLiteDto = modelMapper.map(projectVersion, ProjectVersionLiteDto.class);
+        return ProjectDependenciesDto.builder()
+                .id(project.getId())
+                .version(project.getVersion())
+                .dependencies(new HashSet<>(dependencies.values()))
+                .projectVersion(projectVersionLiteDto).build();
+    }
+
+    @Transactional(readOnly = true)
     public ProjectDependenciesDto getDirectDependencies(int id) {
         Project project = getById(id);
 
