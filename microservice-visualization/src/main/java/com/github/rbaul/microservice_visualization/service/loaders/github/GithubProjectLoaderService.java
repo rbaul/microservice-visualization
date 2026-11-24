@@ -1,6 +1,6 @@
 package com.github.rbaul.microservice_visualization.service.loaders.github;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.Application;
 import com.github.rbaul.microservice_visualization.domain.model.ApplicationType;

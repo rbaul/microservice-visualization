@@ -1,15 +1,15 @@
 package com.github.rbaul.microservice_visualization.domain.model;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.hibernate.annotations.Type;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
@@ -40,16 +40,15 @@ public class Project {
 	private Set<Application> applications;
 	
 	@ToString.Exclude
-	@ElementCollection
+	@JdbcTypeCode(SqlTypes.JSON)
 	private Map<String, List<String>> connections;
 
 	@ToString.Exclude
-	@ElementCollection
+	@JdbcTypeCode(SqlTypes.JSON)
 	private Map<String, List<String>> dependencies;
 
 	@ToString.Exclude
-	@Type(JsonType.class)
-	@Column(columnDefinition = "json")
+	@JdbcTypeCode(SqlTypes.JSON)
 	@Basic(fetch = FetchType.LAZY)
 	private Set<List<String>> librariesCycle;
 	

@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.3'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '4.2.0'
+	id 'io.spring.dependency-management' version '1.1.7'
 	id 'maven-publish'
 }
 
@@ -27,23 +27,24 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.flywaydb:flyway-core'
 
     // OpenApi
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.+'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.2.1'
 
     // Model mapper
     implementation 'org.modelmapper.extensions:modelmapper-spring:3.2.+'
 
 	// GitHub
-	implementation 'org.kohsuke:github-api:1.319'
+	implementation 'org.kohsuke:github-api:1.330'
 
 	// JGraphT
 	implementation 'org.jgrapht:jgrapht-core:1.5.2'
 
 	// Hibernate types
-	implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.7.+'
+	implementation 'io.hypersistence:hypersistence-utils-hibernate-73:3.16.0'
 
+	// H2 console (modularized in Spring Boot 4)
+	implementation 'org.springframework.boot:spring-boot-h2console'
 
 	// WebApp
     implementation project(':microservice-visualization-webapp')

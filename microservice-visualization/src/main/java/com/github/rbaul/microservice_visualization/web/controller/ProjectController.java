@@ -6,9 +6,9 @@ import com.github.rbaul.microservice_visualization.web.dto.ProjectDto;
 import com.github.rbaul.microservice_visualization.web.dto.ProjectLiteDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -40,9 +40,9 @@ public class ProjectController {
     }
 
     @GetMapping("search")
-    public Page<ProjectLiteDto> fetch(@RequestParam("projectVersionId") int projectVersionId,
+    public PagedModel<ProjectLiteDto> fetch(@RequestParam("projectVersionId") int projectVersionId,
                                       @PageableDefault Pageable pageable) {
-        return projectService.search(projectVersionId, pageable);
+        return new PagedModel<>(projectService.search(projectVersionId, pageable));
     }
 
     @GetMapping("/{id}/dependencies")

@@ -1,8 +1,8 @@
 package com.github.rbaul.microservice_visualization.service.loaders;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.github.rbaul.microservice_visualization.config.MicroserviceVisualizationProperties;
 import com.github.rbaul.microservice_visualization.domain.model.*;
 import com.github.rbaul.microservice_visualization.service.AlgorithmUtils;
@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -253,7 +252,7 @@ public abstract class ProjectLoaderService {
     protected Optional<ApplicationDependency> getApplicationDependency(String fileContent) {
         try {
             return Optional.of(objectMapper.readValue(fileContent, ApplicationDependency.class));
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             log.error("Failed read application file", e);
             return Optional.empty();
         }
@@ -278,7 +277,7 @@ public abstract class ProjectLoaderService {
     public ProjectConfig getProjectConfig(String fileContent) {
         try {
             return objectMapperYaml.readValue(fileContent, ProjectConfig.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             log.error("Failed read application file", e);
             return null;
         }

@@ -32,5 +32,8 @@ out/
 /nbdist/
 /.nb-gradle/
 
+### Logs ###
+*.log
+
 ### VS Code ###
 .vscode/

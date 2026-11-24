@@ -9,9 +9,7 @@ spring:
   h2:
     console:
       enabled: true
-
-  flyway:
-    enabled: false
+      path: /h2-console
 
   output:
     ansi:

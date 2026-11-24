@@ -1,8 +1,10 @@
 package com.github.rbaul.microservice_visualization;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.dataformat.yaml.YAMLFactory;
 import com.github.rbaul.microservice_visualization.service.model.ApplicationDependency;
+import com.github.rbaul.microservice_visualization.service.model.ProjectConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,5 +33,13 @@ public class DependenciesConvertTests {
     void validateDependenciesFile() throws IOException {
         Resource resource = new ClassPathResource("basket.json");
         objectMapper.readValue(resource.getContentAsString(StandardCharsets.UTF_8), ApplicationDependency.class);
+    }
+
+    @Test
+    @DisplayName("Validate project config YAML file")
+    void validateProjectConfigFile() throws IOException {
+        ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+        Resource resource = new ClassPathResource("project-config.yaml");
+        yamlMapper.readValue(resource.getContentAsString(StandardCharsets.UTF_8), ProjectConfig.class);
     }
 }

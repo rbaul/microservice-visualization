@@ -1,0 +1,20 @@
+applicationPostfix:
+applicationApiPostfixes:
+  - -api
+groups:
+  - name: Group Demo
+    description: Group Demo description
+    applicationNames:
+      - basket
+      - ordering
+owners:
+  - name: Team 1
+    description: Team 1 - NY
+    applicationNames:
+      - basket
+      - customer
+  - name: Team 2
+    description: Team 2 - TLV
+    applicationNames:
+      - product
+      - ordering

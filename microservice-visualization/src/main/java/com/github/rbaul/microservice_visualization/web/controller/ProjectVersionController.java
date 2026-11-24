@@ -4,9 +4,9 @@ import com.github.rbaul.microservice_visualization.service.ProjectVersionService
 import com.github.rbaul.microservice_visualization.web.dto.ProjectVersionDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,7 +46,7 @@ public class ProjectVersionController {
 	}
 	
 	@GetMapping("search")
-	public Page<ProjectVersionDto> fetch(@RequestParam(required = false, name = "filter") String filter, @PageableDefault Pageable pageable) {
-		return projectVersionService.search(filter, pageable);
+	public PagedModel<ProjectVersionDto> fetch(@RequestParam(required = false, name = "filter") String filter, @PageableDefault Pageable pageable) {
+		return new PagedModel<>(projectVersionService.search(filter, pageable));
 	}
 }
