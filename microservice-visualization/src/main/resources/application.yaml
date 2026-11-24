@@ -31,6 +31,8 @@ spring:
   ai:
     mcp:
       server:
+        # Stateless HTTP MCP server is unauthenticated by default.
+        # Place an appropriate security boundary in front of /mcp in production.
         protocol: STATELESS
         name: microservice-visualization-mcp
         version: 1.0.0

@@ -1,6 +1,8 @@
 package com.github.rbaul.microservice_visualization.domain.repository;
 
 import com.github.rbaul.microservice_visualization.domain.model.ProjectVersion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -9,4 +11,6 @@ public interface ProjectVersionRepository extends JpaRepository<ProjectVersion, 
     Optional<ProjectVersion> findByFullName(String fullName);
 
     Optional<ProjectVersion> findByName(String name);
+
+    Page<ProjectVersion> findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String description, Pageable pageable);
 }

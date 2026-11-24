@@ -142,11 +142,11 @@ public class ProjectService {
         Set<Application> applications = project.getApplications();
         for (Application application : applications) {
             if (application.getType() != ApplicationType.BOM) {
-                for (String dependencyString : application.getDependencies()) {
+                Set<String> dependencyManagements = application.getDependencyManagements().stream()
+                        .map(DependencyManagement::getDependencies)
+                        .flatMap(List::stream).collect(Collectors.toSet());
 
-                    Set<String> dependencyManagements = application.getDependencyManagements().stream()
-                            .map(DependencyManagement::getDependencies)
-                            .flatMap(List::stream).collect(Collectors.toSet());
+                for (String dependencyString : application.getDependencies()) {
 
                     if (!dependencyManagements.contains(dependencyString)) {
                         Dependency dependency = ConverterUtils.convertDependency(dependencyString);
